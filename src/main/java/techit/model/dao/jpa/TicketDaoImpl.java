@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import techit.model.Ticket;
@@ -12,6 +13,7 @@ import techit.model.Unit;
 import techit.model.User;
 import techit.model.dao.TicketDao;
 
+@Repository
 public class TicketDaoImpl implements TicketDao {
 
 	@PersistenceContext

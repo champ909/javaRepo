@@ -5,12 +5,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import techit.model.Ticket;
 import techit.model.Update;
 import techit.model.dao.UpdateDao;
 
+@Repository
 public class UpdateDaoImpl implements UpdateDao {
 
 	@PersistenceContext
@@ -28,7 +30,7 @@ public class UpdateDaoImpl implements UpdateDao {
 
 	@Override
 	public List<Update> getUpdates(Ticket ticket, boolean orderByLastUpdate) {
-		String query = "from Update where ticket =: ticket" + (orderByLastUpdate ? " order by modifiedDate" : "");
+		String query = "from Update where ticket =:ticket" + (orderByLastUpdate ? " order by modifiedDate" : "");
 		return entityManager.createQuery(query, Update.class).setParameter("ticket", ticket).getResultList();
 	}
 
