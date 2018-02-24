@@ -8,6 +8,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -29,7 +32,7 @@ public class Ticket implements Serializable {
 	@Column(nullable = false)
 	private String userLastName; // Requester's last name
 
-	@Column(nullable = false)
+	@ManyToMany(mappedBy = "tickets")
 	private List<User> technicians; // List of all technicians
 
 	@Column(nullable = false)
@@ -38,7 +41,7 @@ public class Ticket implements Serializable {
 	@Column(nullable = false)
 	private Priority currentPriority; // Importance or level of urgency of the ticket
 
-	@Column
+	@Column()
 	private String phone; // Requestor's phone
 
 	@Column(nullable = false)
@@ -47,13 +50,13 @@ public class Ticket implements Serializable {
 	@Column(nullable = false)
 	private String department; // Department that is related to the ticket or the person who created the ticket
 
-	@Column(nullable = false)
-	private int unitId; // The unit that was assigned to the ticket.
+	@ManyToOne
+	private Unit unit; // The unit that was assigned to the ticket.
 
 	@Column(nullable = false)
 	private String subject; // Subject of the ticket.
 
-	@Column
+	@Column()
 	private String details; // Text concerning the project.
 
 	@Column(nullable = false)
@@ -75,7 +78,7 @@ public class Ticket implements Serializable {
 	@Column
 	private String ticketLocation; // Location where the project is.
 
-	@Column
+	@OneToMany(mappedBy = "ticket")
 	private List<Update> updates; // List of all updates that was made to the ticket.
 	// Needs more work...
 
@@ -157,7 +160,7 @@ public class Ticket implements Serializable {
 	// Full constructor for every field, probably need when pulling existing
 	// data from database
 	public Ticket(Long id, String username, String firstName, String lastName, List<User> technician, String phone,
-			String email, String department, int progress, int priority, int unitId, String subject, String details,
+			String email, String department, int progress, int priority, Unit unit, String subject, String details,
 			Date startDate, String startDateTime, Date endDate, Date lastUpdated, String lastUpdatedTime,
 			String ticketLocation, List<Update> updates, String completionDetails) {
 		this.id = id;
@@ -204,7 +207,7 @@ public class Ticket implements Serializable {
 			break;
 		}
 
-		this.unitId = unitId;
+		this.unit = unit;
 		this.subject = subject;
 		this.details = details;
 		this.startDate = startDate;
@@ -220,7 +223,7 @@ public class Ticket implements Serializable {
 
 	// Constructor without updates list and technicians list
 	public Ticket(Long id, String username, String userFirstName, String userLastName, String phone, String email,
-			String department, int priority, int unitId, String subject, String details, Date startDate,
+			String department, int priority, Unit unit, String subject, String details, Date startDate,
 			Date lastUpdated, String ticketLocation) {
 		this.id = id;
 		this.username = username;
@@ -229,7 +232,7 @@ public class Ticket implements Serializable {
 		this.phone = phone;
 		this.email = email;
 		this.department = department;
-		this.unitId = unitId;
+		this.unit = unit;
 		this.subject = subject;
 		this.details = details;
 		this.startDate = startDate;
@@ -255,7 +258,7 @@ public class Ticket implements Serializable {
 
 	// Constructor without updates list
 	public Ticket(Long id, String username, String userFirstName, String userLastName, String phone, String email,
-			String department, int priority, int unitId, String subject, String details, Date startDate,
+			String department, int priority, Unit unit, String subject, String details, Date startDate,
 			Date lastUpdated, String ticketLocation, List<User> technicianList) {
 		this.id = id;
 		this.username = username;
@@ -263,7 +266,7 @@ public class Ticket implements Serializable {
 		this.userLastName = userLastName;
 		this.phone = phone;
 		this.email = email;
-		this.unitId = unitId;
+		this.unit = unit;
 		this.subject = subject;
 		this.details = details;
 		this.startDate = startDate;
@@ -369,12 +372,12 @@ public class Ticket implements Serializable {
 		this.department = department;
 	}
 
-	public int getUnitId() {
-		return unitId;
+	public Unit getUnit() {
+		return unit;
 	}
 
-	public void setUnitId(int unitId) {
-		this.unitId = unitId;
+	public void setUnit(Unit unit) {
+		this.unit = unit;
 	}
 
 	public String getSubject() {
