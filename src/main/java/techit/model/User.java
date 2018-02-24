@@ -1,11 +1,14 @@
 package techit.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -49,8 +52,11 @@ public class User implements Serializable {
 	@Column(nullable = false)
 	private Position status;
 	
-	@Column(nullable = false)
-	private int unitId;
+	@ManyToOne
+	private Unit unit;
+
+	@ManyToMany
+	private List<Ticket> tickets;
 
 	// Types of users on the system.
 	private enum Position {
@@ -77,14 +83,14 @@ public class User implements Serializable {
 		this.lastName = lastname;
 		this.username = username;
 		this.status = Position.USER;
-		this.unitId = 0; // User does not belongs to any unit\
+//		this.unitId = 0; // User does not belongs to any unit\
 		this.password = password;
 		this.enabled = true;
 	}
 
 	// Full user paramenter constructor
 	public User(long id, String firstname, String lastname, String username, String password, String phone,
-			String email, String department, int position, int unit_id) {
+			String email, String department, int position, Unit unit) {
 		this.id = id;
 		this.firstName = firstname;
 		this.lastName = lastname;
@@ -108,7 +114,7 @@ public class User implements Serializable {
 			break;
 		}
 
-		this.unitId = unit_id;
+		this.unit = unit;
 
 		this.password = password;
 		this.enabled = true;
@@ -234,18 +240,18 @@ public class User implements Serializable {
 		return status;
 	}
 
-	public int getUnitId() {
-		return unitId;
+	public Unit getUnit() {
+		return unit;
 	}
 
-	public void setUnitId(int unitId) {
-		this.unitId = unitId;
+	public void setUnitId(Unit unit) {
+		this.unit = unit;
 	}
 
 	@Override
 	public String toString() {
 		return "[" + id + ", " + username + ", " + password + ", " + firstName + ", " + lastName + ", " + phoneNumber
-				+ ", " + email + ", " + department + ", " + status + ", " + unitId + "]";
+				+ ", " + email + ", " + department + ", " + status + ", " + unit.getId() + "]";
 	}
 
 }
