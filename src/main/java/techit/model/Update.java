@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -18,13 +19,13 @@ public class Update implements Serializable {
 	@GeneratedValue
 	private int id;
 	
-	@Column(nullable=false)
-	private int ticketId;
+	@ManyToOne
+	private Ticket ticket;
 
 	@Column(nullable=false)
 	private String modifier; // modifier's username
 
-	@Column
+	@Column(nullable = false)
 	private String updateDetails;
 	
 	@Column(nullable=false)
@@ -34,10 +35,10 @@ public class Update implements Serializable {
 		
 	}
 	
-	public Update(int id, int ticketId, String modifier, String updateDetails, String modifiedDate) {
+	public Update(int id, Ticket ticket, String modifier, String updateDetails, String modifiedDate) {
 		super();
 		this.id = id;
-		this.ticketId = ticketId;
+		this.ticket = ticket;
 		this.modifier = modifier;
 		this.updateDetails = updateDetails;
 		this.modifiedDate = modifiedDate;
@@ -51,12 +52,12 @@ public class Update implements Serializable {
 		this.id = id;
 	}
 
-	public int getTicketId() {
-		return ticketId;
+	public Ticket getTicket() {
+		return ticket;
 	}
 
-	public void setTicketId(int ticketId) {
-		this.ticketId = ticketId;
+	public void setTicket(Ticket ticket) {
+		this.ticket = ticket;
 	}
 
 	public String getModifier() {
