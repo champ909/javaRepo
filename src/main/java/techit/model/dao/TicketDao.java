@@ -15,6 +15,7 @@ public interface TicketDao {
 	Ticket saveTicket(Ticket ticket);
 	
 	List<Ticket> getTickets(Unit unit);
-	
-	List<Ticket> getTickets(User technician);
+
+	// Can be fetched from User obj
+//	List<Ticket> getTickets(User technician);
 }

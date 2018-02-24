@@ -15,5 +15,6 @@ public interface UserDao {
 
 	User getUser(String username);				// validate the password from User object at service class
 
-	List<User> getTechnicians(Ticket ticket);
+	// Can be fetched from Ticket obj
+//	List<User> getTechnicians(Ticket ticket);
 }
