@@ -248,6 +248,22 @@ public class User implements Serializable {
 		this.unit = unit;
 	}
 
+	public List<Ticket> getTickets() {
+		return tickets;
+	}
+
+	public void setTickets(List<Ticket> tickets) {
+		this.tickets = tickets;
+	}
+
+	public void setStatus(Position status) {
+		this.status = status;
+	}
+
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
 	@Override
 	public String toString() {
 		return "[" + id + ", " + username + ", " + pass + ", " + firstName + ", " + lastName + ", " + phone

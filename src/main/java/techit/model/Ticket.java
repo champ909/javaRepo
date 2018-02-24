@@ -336,16 +336,47 @@ public class Ticket implements Serializable {
 		return currentProgress;
 	}
 
-	public void setCurrentProgress(Progress currentProgress) {
-		this.currentProgress = currentProgress;
+	public void setCurrentProgress(int progress) {
+		switch (progress) {
+		case 0:
+		default:
+			this.currentProgress = Progress.OPEN;
+			break;
+		case 1:
+			this.currentProgress = Progress.INPROGRESS;
+			break;
+		case 2:
+			this.currentProgress = Progress.ONHOLD;
+			break;
+		case 3:
+			this.currentProgress = Progress.COMPLETED;
+			break;
+		case 4:
+			this.currentProgress = Progress.CLOSED;
+			break;
+		}
 	}
 
 	public Priority getCurrentPriority() {
 		return currentPriority;
 	}
 
-	public void setCurrentPriority(Priority currentPriority) {
-		this.currentPriority = currentPriority;
+	public void setCurrentPriority(int priority) {
+		switch (priority) {
+		case 0:
+		default:
+			this.currentPriority = Priority.NA;
+			break;
+		case 1:
+			this.currentPriority = Priority.LOW;
+			break;
+		case 2:
+			this.currentPriority = Priority.MEDIUM;
+			break;
+		case 3:
+			this.currentPriority = Priority.HIGH;
+			break;
+		}
 	}
 
 	public String getPhone() {
@@ -459,4 +490,13 @@ public class Ticket implements Serializable {
 	public void setCompletionDetails(String completionDetails) {
 		this.completionDetails = completionDetails;
 	}
+
+	public void setCurrentProgress(Progress currentProgress) {
+		this.currentProgress = currentProgress;
+	}
+
+	public void setCurrentPriority(Priority currentPriority) {
+		this.currentPriority = currentPriority;
+	}
+	
 }

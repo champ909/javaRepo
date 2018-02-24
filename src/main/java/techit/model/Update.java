@@ -83,4 +83,5 @@ public class Update implements Serializable {
 	public void setModifiedDate(String modifiedDate) {
 		this.modifiedDate = modifiedDate;
 	}
+	
 }
