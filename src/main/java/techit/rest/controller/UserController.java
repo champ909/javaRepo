@@ -34,7 +34,7 @@ public class UserController {
     @RequestMapping(value = "/user/", method = RequestMethod.POST)
     public User addUser( @RequestBody User user )
     {
-        if( user.getUsername() == null || user.getPassword() == null )
+        if( user.getUsername() == null || user.getPass() == null )
             throw new RestException( 400, "Missing username and/or password." );
 
         return userDao.saveUser( user );

@@ -17,7 +17,7 @@ public class Update implements Serializable {
 	
 	@Id
 	@GeneratedValue
-	private int id;
+	private Long id;
 	
 	@ManyToOne
 	private Ticket ticket;
@@ -35,7 +35,7 @@ public class Update implements Serializable {
 		
 	}
 	
-	public Update(int id, Ticket ticket, String modifier, String updateDetails, String modifiedDate) {
+	public Update(Long id, Ticket ticket, String modifier, String updateDetails, String modifiedDate) {
 		super();
 		this.id = id;
 		this.ticket = ticket;
@@ -44,11 +44,11 @@ public class Update implements Serializable {
 		this.modifiedDate = modifiedDate;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

@@ -38,7 +38,7 @@ public class Ticket implements Serializable {
 	@Column(nullable = false)
 	private Progress currentProgress; // Current progress of the ticket
 
-	@Column(nullable = false)
+	@Column()
 	private Priority currentPriority; // Importance or level of urgency of the ticket
 
 	@Column()
@@ -47,7 +47,7 @@ public class Ticket implements Serializable {
 	@Column(nullable = false)
 	private String email; // Requestor's email. May be different from the User's login email.
 
-	@Column(nullable = false)
+	@Column()
 	private String department; // Department that is related to the ticket or the person who created the ticket
 
 	@ManyToOne
@@ -62,27 +62,27 @@ public class Ticket implements Serializable {
 	@Column(nullable = false)
 	private Date startDate; // Project's starting date.
 
-	@Column(nullable = false)
+	@Column()
 	private String startDateTime; // Time of when the ticket was created.
 
-	@Column
+	@Column()
 	private Date endDate; // When the project was completed.
 
-	@Column
+	@Column()
 	private Date lastUpdated; // Last date where changes were made to the ticket (edits, technician updates,
 								// etc.)
 
-	@Column
+	@Column()
 	private String lastUpdatedTime; // Same as lastUpdated but this is for the time changes were made.
 
-	@Column
+	@Column()
 	private String ticketLocation; // Location where the project is.
 
 	@OneToMany(mappedBy = "ticket")
 	private List<Update> updates; // List of all updates that was made to the ticket.
 	// Needs more work...
 
-	@Column
+	@Column()
 	private String completionDetails; // Information pertaining vendors, cost,
 										// materials used.
 	// Type of progresses

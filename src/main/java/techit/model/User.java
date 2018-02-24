@@ -29,7 +29,7 @@ public class User implements Serializable {
 
 	@JsonProperty(access = Access.WRITE_ONLY)
 	@Column(nullable = false)
-	private String password;
+	private String pass;
 
 	@Column(nullable = false)
 	private boolean enabled = true;
@@ -41,7 +41,7 @@ public class User implements Serializable {
 	private String lastName;
 	
 	@Column()
-	private String phoneNumber;
+	private String phone;
 	
 	@Column()
 	private String department;
@@ -84,7 +84,7 @@ public class User implements Serializable {
 		this.username = username;
 		this.status = Position.USER;
 //		this.unitId = 0; // User does not belongs to any unit\
-		this.password = password;
+		this.pass = password;
 		this.enabled = true;
 	}
 
@@ -95,7 +95,7 @@ public class User implements Serializable {
 		this.firstName = firstname;
 		this.lastName = lastname;
 		this.username = username;
-		this.phoneNumber = phone;
+		this.phone = phone;
 		this.email = email;
 		this.department = department;
 		switch (position) {
@@ -116,7 +116,7 @@ public class User implements Serializable {
 
 		this.unit = unit;
 
-		this.password = password;
+		this.pass = password;
 		this.enabled = true;
 	}
 
@@ -136,12 +136,12 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getPass() {
+		return pass;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPass(String password) {
+		this.pass = password;
 	}
 
 	public boolean isEnabled() {
@@ -168,12 +168,12 @@ public class User implements Serializable {
 		this.lastName = lastName;
 	}
 
-	public String getPhoneNumber() {
-		return phoneNumber;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public String getDepartment() {
@@ -250,7 +250,7 @@ public class User implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[" + id + ", " + username + ", " + password + ", " + firstName + ", " + lastName + ", " + phoneNumber
+		return "[" + id + ", " + username + ", " + pass + ", " + firstName + ", " + lastName + ", " + phone
 				+ ", " + email + ", " + department + ", " + status + ", " + unit.getId() + "]";
 	}
 

@@ -18,20 +18,20 @@ public class Unit implements Serializable {
 
 	@Id
 	@GeneratedValue
-	private int id; // Unit's unique id.
+	private Long id; // Unit's unique id.
 	
 	@Column(nullable = false)
 	private String name; // Name of the department.
 
 	// A unit may have more than one supervisor. This will allow them to assign
 	// temporary leads when they are gone.
-	@Column(nullable = false)
+	@Column()
 	private String phone;
 	
-	@Column(nullable = false)
+	@Column()
 	private String location;
 	
-	@Column(nullable = false)
+	@Column()
 	private String email;
 
 	@Column()
@@ -53,11 +53,11 @@ public class Unit implements Serializable {
 		this.description = description;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
