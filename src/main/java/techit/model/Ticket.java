@@ -1,13 +1,18 @@
 package techit.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -17,279 +22,77 @@ import javax.persistence.Table;
 @Table(name = "tickets")
 public class Ticket implements Serializable {
 
+	public enum Priority {
+		LOW, MEDIUM, HIGH
+	}
+
+	public enum Status {
+		OPEN, ASSIGNED, ONHOLD, COMPLETED, ClOSED
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
-	private Long id; // Ticket's unique id.
-
-	@Column(nullable = false)
-	private String username; // The user who requested the ticket.
-
-	@Column(nullable = false)
-	private String userFirstName; // Requester's first name
-
-	@Column(nullable = false)
-	private String userLastName; // Requester's last name
-
-	@ManyToMany(mappedBy = "tickets")
-	private List<User> technicians; // List of all technicians
-
-	@Column(nullable = false)
-	private Progress currentProgress; // Current progress of the ticket
-
-	@Column()
-	private Priority currentPriority; // Importance or level of urgency of the ticket
-
-	@Column()
-	private String phone; // Requestor's phone
-
-	@Column(nullable = false)
-	private String email; // Requestor's email. May be different from the User's login email.
-
-	@Column()
-	private String department; // Department that is related to the ticket or the person who created the ticket
+	private Long id;
 
 	@ManyToOne
-	private Unit unit; // The unit that was assigned to the ticket.
+	@JoinColumn(name = "created_by", nullable = false)
+	private User createdBy;
+
+	@Column(name = "created_for_name")
+	private String createdForName;
+
+	@Column(name = "created_for_email", nullable = false)
+	private String createdForEmail;
+
+	@Column(name = "created_for_phone")
+	private String createdForPhone;
+
+	@Column(name = "created_for_department")
+	private String createdForDepartment;
 
 	@Column(nullable = false)
-	private String subject; // Subject of the ticket.
+	private String subject;
 
-	@Column()
-	private String details; // Text concerning the project.
+	private String details;
 
-	@Column(nullable = false)
-	private Date startDate; // Project's starting date.
+	private String location;
 
-	@Column()
-	private String startDateTime; // Time of when the ticket was created.
+	@ManyToOne
+	@JoinColumn(nullable = false)
+	private Unit unit;
 
-	@Column()
-	private Date endDate; // When the project was completed.
-
-	@Column()
-	private Date lastUpdated; // Last date where changes were made to the ticket (edits, technician updates,
-								// etc.)
-
-	@Column()
-	private String lastUpdatedTime; // Same as lastUpdated but this is for the time changes were made.
-
-	@Column()
-	private String ticketLocation; // Location where the project is.
+	@ManyToMany
+	@JoinTable(name = "ticket_technicians", joinColumns = @JoinColumn(name = "ticket_id"), inverseJoinColumns = @JoinColumn(name = "technician_id"))
+	private List<User> technicians;
 
 	@OneToMany(mappedBy = "ticket")
-	private List<Update> updates; // List of all updates that was made to the ticket.
-	// Needs more work...
+	private List<Update> updates;
 
-	@Column()
-	private String completionDetails; // Information pertaining vendors, cost,
-										// materials used.
-	// Type of progresses
+	@Enumerated(EnumType.STRING)
+	private Priority priority;
 
-	private enum Progress {
-		OPEN(0), INPROGRESS(1), ONHOLD(2), COMPLETED(3), CLOSED(4);
+	@Enumerated(EnumType.STRING)
+	private Status status;
 
-		private int progress;
+	@Column(name = "date_created")
+	private Date dateCreated;
 
-		Progress(int progress) {
-			this.progress = progress;
-		};
+	@Column(name = "date_assigned")
+	private Date dateAssigned;
 
-		public String getProgressValue() {
-			String progress = "";
-			switch (this.progress) {
-			case 0:
-				progress = "OPEN";
-				break;
-			case 1:
-				progress = "IN PROGRESS";
-				break;
-			case 2:
-				progress = "ON HOLD";
-				break;
-			case 3:
-				progress = "COMPLETED";
-				break;
-			case 4:
-				progress = "CLOSED";
-				break;
-			}
-			return progress;
-		}
+	@Column(name = "date_updated")
+	private Date dateUpdated;
 
-	};
-
-	// Type of priority
-	private enum Priority {
-		NA(0), LOW(1), MEDIUM(2), HIGH(3);
-		private int priority;
-
-		Priority(int priority) {
-			this.priority = priority;
-		}
-
-		public String getPriorityValue() {
-			String priority = "";
-			switch (this.priority) {
-			case 0:
-				priority = "NOT ASSIGNED";
-				break;
-			case 1:
-				priority = "LOW";
-				break;
-			case 2:
-				priority = "MEDIUM";
-				break;
-			case 3:
-				priority = "HIGH";
-				break;
-			}
-			return priority;
-		}
-
-		public int getPriorityNumericValue() {
-			return this.priority;
-		}
-	};
+	@Column(name = "date_closed")
+	private Date dateClosed;
 
 	public Ticket() {
-
-	}
-
-	// Full constructor for every field, probably need when pulling existing
-	// data from database
-	public Ticket(Long id, String username, String firstName, String lastName, List<User> technician, String phone,
-			String email, String department, int progress, int priority, Unit unit, String subject, String details,
-			Date startDate, String startDateTime, Date endDate, Date lastUpdated, String lastUpdatedTime,
-			String ticketLocation, List<Update> updates, String completionDetails) {
-		this.id = id;
-		this.username = username;
-		this.userFirstName = firstName;
-		this.userLastName = lastName;
-		this.technicians = technician;
-		this.phone = phone;
-		this.email = email;
-		this.department = department;
-
-		switch (progress) {
-		case 0:
-		default:
-			this.currentProgress = Progress.OPEN;
-			break;
-		case 1:
-			this.currentProgress = Progress.INPROGRESS;
-			break;
-		case 2:
-			this.currentProgress = Progress.ONHOLD;
-			break;
-		case 3:
-			this.currentProgress = Progress.COMPLETED;
-			break;
-		case 4:
-			this.currentProgress = Progress.CLOSED;
-			break;
-		}
-
-		switch (priority) {
-		case 0:
-		default:
-			this.currentPriority = Priority.NA;
-			break;
-		case 1:
-			this.currentPriority = Priority.LOW;
-			break;
-		case 2:
-			this.currentPriority = Priority.MEDIUM;
-			break;
-		case 3:
-			this.currentPriority = Priority.HIGH;
-			break;
-		}
-
-		this.unit = unit;
-		this.subject = subject;
-		this.details = details;
-		this.startDate = startDate;
-		this.startDateTime = startDateTime;
-		this.endDate = endDate;
-		this.lastUpdated = lastUpdated;
-		this.lastUpdatedTime = lastUpdatedTime;
-		this.updates = updates;
-		this.ticketLocation = ticketLocation;
-		this.completionDetails = completionDetails;
-
-	}
-
-	// Constructor without updates list and technicians list
-	public Ticket(Long id, String username, String userFirstName, String userLastName, String phone, String email,
-			String department, int priority, Unit unit, String subject, String details, Date startDate,
-			Date lastUpdated, String ticketLocation) {
-		this.id = id;
-		this.username = username;
-		this.userFirstName = userFirstName;
-		this.userLastName = userLastName;
-		this.phone = phone;
-		this.email = email;
-		this.department = department;
-		this.unit = unit;
-		this.subject = subject;
-		this.details = details;
-		this.startDate = startDate;
-		this.lastUpdated = lastUpdated;
-		this.ticketLocation = ticketLocation;
-
-		switch (priority) {
-		case 0:
-		default:
-			this.currentPriority = Priority.NA;
-			break;
-		case 1:
-			this.currentPriority = Priority.LOW;
-			break;
-		case 2:
-			this.currentPriority = Priority.MEDIUM;
-			break;
-		case 3:
-			this.currentPriority = Priority.HIGH;
-			break;
-		}
-	}
-
-	// Constructor without updates list
-	public Ticket(Long id, String username, String userFirstName, String userLastName, String phone, String email,
-			String department, int priority, Unit unit, String subject, String details, Date startDate,
-			Date lastUpdated, String ticketLocation, List<User> technicianList) {
-		this.id = id;
-		this.username = username;
-		this.userFirstName = userFirstName;
-		this.userLastName = userLastName;
-		this.phone = phone;
-		this.email = email;
-		this.unit = unit;
-		this.subject = subject;
-		this.details = details;
-		this.startDate = startDate;
-		this.lastUpdated = lastUpdated;
-		this.ticketLocation = ticketLocation;
-		this.technicians = technicianList;
-
-		switch (priority) {
-		case 0:
-		default:
-			this.currentPriority = Priority.NA;
-			break;
-		case 1:
-			this.currentPriority = Priority.LOW;
-			break;
-		case 2:
-			this.currentPriority = Priority.MEDIUM;
-			break;
-		case 3:
-			this.currentPriority = Priority.HIGH;
-			break;
-		}
-		this.department = department;
+		priority = Priority.MEDIUM;
+		status = Status.OPEN;
+		technicians = new ArrayList<User>();
+		updates = new ArrayList<Update>();
 	}
 
 	public Long getId() {
@@ -300,115 +103,44 @@ public class Ticket implements Serializable {
 		this.id = id;
 	}
 
-	public String getUsername() {
-		return username;
+	public User getCreatedBy() {
+		return createdBy;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
 	}
 
-	public String getUserFirstName() {
-		return userFirstName;
+	public String getCreatedForName() {
+		return createdForName;
 	}
 
-	public void setUserFirstName(String userFirstName) {
-		this.userFirstName = userFirstName;
+	public void setCreatedForName(String createdForName) {
+		this.createdForName = createdForName;
 	}
 
-	public String getUserLastName() {
-		return userLastName;
+	public String getCreatedForEmail() {
+		return createdForEmail;
 	}
 
-	public void setUserLastName(String userLastName) {
-		this.userLastName = userLastName;
+	public void setCreatedForEmail(String createdForEmail) {
+		this.createdForEmail = createdForEmail;
 	}
 
-	public List<User> getTechnicians() {
-		return technicians;
+	public String getCreatedForPhone() {
+		return createdForPhone;
 	}
 
-	public void setTechnicians(List<User> technicians) {
-		this.technicians = technicians;
+	public void setCreatedForPhone(String createdForPhone) {
+		this.createdForPhone = createdForPhone;
 	}
 
-	public Progress getCurrentProgress() {
-		return currentProgress;
+	public String getCreatedForDepartment() {
+		return createdForDepartment;
 	}
 
-	public void setCurrentProgress(int progress) {
-		switch (progress) {
-		case 0:
-		default:
-			this.currentProgress = Progress.OPEN;
-			break;
-		case 1:
-			this.currentProgress = Progress.INPROGRESS;
-			break;
-		case 2:
-			this.currentProgress = Progress.ONHOLD;
-			break;
-		case 3:
-			this.currentProgress = Progress.COMPLETED;
-			break;
-		case 4:
-			this.currentProgress = Progress.CLOSED;
-			break;
-		}
-	}
-
-	public Priority getCurrentPriority() {
-		return currentPriority;
-	}
-
-	public void setCurrentPriority(int priority) {
-		switch (priority) {
-		case 0:
-		default:
-			this.currentPriority = Priority.NA;
-			break;
-		case 1:
-			this.currentPriority = Priority.LOW;
-			break;
-		case 2:
-			this.currentPriority = Priority.MEDIUM;
-			break;
-		case 3:
-			this.currentPriority = Priority.HIGH;
-			break;
-		}
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(String department) {
-		this.department = department;
-	}
-
-	public Unit getUnit() {
-		return unit;
-	}
-
-	public void setUnit(Unit unit) {
-		this.unit = unit;
+	public void setCreatedForDepartment(String createdForDepartment) {
+		this.createdForDepartment = createdForDepartment;
 	}
 
 	public String getSubject() {
@@ -427,52 +159,28 @@ public class Ticket implements Serializable {
 		this.details = details;
 	}
 
-	public Date getStartDate() {
-		return startDate;
+	public String getLocation() {
+		return location;
 	}
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
-	public String getStartDateTime() {
-		return startDateTime;
+	public Unit getUnit() {
+		return unit;
 	}
 
-	public void setStartDateTime(String startDateTime) {
-		this.startDateTime = startDateTime;
+	public void setUnit(Unit unit) {
+		this.unit = unit;
 	}
 
-	public Date getEndDate() {
-		return endDate;
+	public List<User> getTechnicians() {
+		return technicians;
 	}
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public Date getLastUpdated() {
-		return lastUpdated;
-	}
-
-	public void setLastUpdated(Date lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
-
-	public String getLastUpdatedTime() {
-		return lastUpdatedTime;
-	}
-
-	public void setLastUpdatedTime(String lastUpdatedTime) {
-		this.lastUpdatedTime = lastUpdatedTime;
-	}
-
-	public String getTicketLocation() {
-		return ticketLocation;
-	}
-
-	public void setTicketLocation(String ticketLocation) {
-		this.ticketLocation = ticketLocation;
+	public void setTechnicians(List<User> technicians) {
+		this.technicians = technicians;
 	}
 
 	public List<Update> getUpdates() {
@@ -483,20 +191,52 @@ public class Ticket implements Serializable {
 		this.updates = updates;
 	}
 
-	public String getCompletionDetails() {
-		return completionDetails;
+	public Priority getPriority() {
+		return priority;
 	}
 
-	public void setCompletionDetails(String completionDetails) {
-		this.completionDetails = completionDetails;
+	public void setPriority(Priority priority) {
+		this.priority = priority;
 	}
 
-	public void setCurrentProgress(Progress currentProgress) {
-		this.currentProgress = currentProgress;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setCurrentPriority(Priority currentPriority) {
-		this.currentPriority = currentPriority;
+	public void setStatus(Status status) {
+		this.status = status;
 	}
-	
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public Date getDateAssigned() {
+		return dateAssigned;
+	}
+
+	public void setDateAssigned(Date dateAssigned) {
+		this.dateAssigned = dateAssigned;
+	}
+
+	public Date getDateUpdated() {
+		return dateUpdated;
+	}
+
+	public void setDateUpdated(Date dateUpdated) {
+		this.dateUpdated = dateUpdated;
+	}
+
+	public Date getDateClosed() {
+		return dateClosed;
+	}
+
+	public void setDateClosed(Date dateClosed) {
+		this.dateClosed = dateClosed;
+	}
+
 }

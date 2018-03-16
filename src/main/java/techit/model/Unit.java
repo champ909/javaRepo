@@ -1,56 +1,54 @@
 package techit.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "units")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Unit implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
-	private Long id; // Unit's unique id.
-	
-	@Column(nullable = false)
-	private String name; // Name of the department.
+	private Long id;
 
-	// A unit may have more than one supervisor. This will allow them to assign
-	// temporary leads when they are gone.
-	@Column()
-	private String phone;
-	
-	@Column()
+	@Column(nullable = false, unique = true)
+	private String name;
+
 	private String location;
-	
-	@Column()
+
 	private String email;
 
-	@Column()
+	private String phone;
+
 	private String description;
-	
-	@OneToMany(mappedBy = "unit")
-	private List<Ticket> tickets;
+
+	@ManyToMany
+	@JoinTable(name = "unit_supervisors", joinColumns = @JoinColumn(name = "unit_id"), inverseJoinColumns = @JoinColumn(name = "supervisor_id"))
+	private List<User> supervisors;
+
+	@ManyToMany
+	@JoinTable(name = "unit_technicians", joinColumns = @JoinColumn(name = "unit_id"), inverseJoinColumns = @JoinColumn(name = "technician_id"))
+	private List<User> technicians;
 
 	public Unit() {
-		
-	}
-
-	public Unit(String name, String phone, String location, String email, String description) {
-		super();
-		this.name = name;
-		this.phone = phone;
-		this.location = location;
-		this.email = email;
-		this.description = description;
+		supervisors = new ArrayList<User>();
+		technicians = new ArrayList<User>();
 	}
 
 	public Long getId() {
@@ -69,14 +67,6 @@ public class Unit implements Serializable {
 		this.name = name;
 	}
 
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
 	public String getLocation() {
 		return location;
 	}
@@ -93,6 +83,14 @@ public class Unit implements Serializable {
 		this.email = email;
 	}
 
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -101,12 +99,20 @@ public class Unit implements Serializable {
 		this.description = description;
 	}
 
-	public List<Ticket> getTickets() {
-		return tickets;
+	public List<User> getSupervisors() {
+		return supervisors;
 	}
 
-	public void setTickets(List<Ticket> tickets) {
-		this.tickets = tickets;
+	public void setSupervisors(List<User> supervisors) {
+		this.supervisors = supervisors;
 	}
-	
+
+	public List<User> getTechnicians() {
+		return technicians;
+	}
+
+	public void setTechnicians(List<User> technicians) {
+		this.technicians = technicians;
+	}
+
 }

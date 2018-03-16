@@ -30,24 +30,37 @@ public class TicketDaoImpl implements TicketDao {
 	}
 
 	@Override
+	public List<Ticket> getTicketsCreatedBy(User user) {
+		String query = "from Ticket where createdBy = :user";
+
+		return entityManager.createQuery(query, Ticket.class).setParameter("user", user).getResultList();
+	}
+
+	@Override
+	public List<Ticket> getTicketsCreatedFor(String email) {
+		String query = "from Ticket where createdForEmail = :email";
+
+		return entityManager.createQuery(query, Ticket.class).setParameter("email", email).getResultList();
+	}
+
+	@Override
+	public List<Ticket> getTicketsAssignedTo(Unit unit) {
+		String query = "from Ticket where unit = :unit";
+
+		return entityManager.createQuery(query, Ticket.class).setParameter("unit", unit).getResultList();
+	}
+
+	@Override
+	public List<Ticket> getTocketsAssignedTo(User technician) {
+		String query = "select t from Ticket t join t.technicians tt " + "where tt = :technician";
+
+		return entityManager.createQuery(query, Ticket.class).setParameter("technician", technician).getResultList();
+	}
+
+	@Override
 	@Transactional
 	public Ticket saveTicket(Ticket ticket) {
 		return entityManager.merge(ticket);
 	}
-
-	@Override
-	public List<Ticket> getTickets(Unit unit) {
-		return entityManager.createQuery("from Ticket where unit=:unit", Ticket.class)
-				.setParameter("unit", unit).getResultList();
-	}
-
-	// Can be fetched from User obj
-//	@Override
-//	public List<Ticket> getTickets(User technician) {
-//		return entityManager.createQuery("from Ticket t join fetch t.technicians u where u=:technician", Ticket.class)
-//				.setParameter("technician", technician).getResultList();
-//	}
-
-
 
 }

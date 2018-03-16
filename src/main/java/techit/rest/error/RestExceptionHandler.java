@@ -10,24 +10,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class RestExceptionHandler {
 
-    private static Logger logger = LogManager
-        .getLogger( RestExceptionHandler.class );
+	private static Logger logger = LogManager.getLogger(RestExceptionHandler.class);
 
-    @ExceptionHandler(RestException.class)
-    public ResponseEntity<Object> handleRestExceptions( RestException ex )
-    {
-        RestError error = ex.getError();
-        return new ResponseEntity<Object>( ex.getError(),
-            HttpStatus.valueOf( error.getStatusCode() ) );
-    }
+	@ExceptionHandler(RestException.class)
+	public ResponseEntity<Object> handleRestExceptions(RestException ex) {
+		RestError error = ex.getError();
+		return new ResponseEntity<Object>(ex.getError(), HttpStatus.valueOf(error.getStatusCode()));
+	}
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleOtherExceptions( Exception ex )
-    {
-        logger.error( "General Error", ex );
-        return new ResponseEntity<Object>(
-            new RestError( 500, ex.getMessage() ),
-            HttpStatus.INTERNAL_SERVER_ERROR );
-    }
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<Object> handleOtherExceptions(Exception ex) {
+		logger.error("General Error", ex);
+		return new ResponseEntity<Object>(new RestError(500, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }

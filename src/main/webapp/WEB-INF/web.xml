@@ -21,5 +21,15 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
+    <filter>
+        <filter-name>jpaFilter</filter-name>  
+        <filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>  
+    </filter>  
+
+    <filter-mapping>  
+        <filter-name>jpaFilter</filter-name>  
+        <url-pattern>/api/*</url-pattern>  
+    </filter-mapping>
+
 </web-app>
 

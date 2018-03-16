@@ -20,9 +20,12 @@ public class TicketDaoTest extends AbstractTransactionalTestNGSpringContextTests
 	@Autowired
 	UnitDao unitDao;
 
+	@Autowired
+	UserDao userDao;
+
 	@Test
 	public void getTicket() {
-		assert ticketDao.getTicket(1L).getUsername().equalsIgnoreCase("jojo");
+		assert ticketDao.getTicket(1L).getCreatedBy().getUsername().equalsIgnoreCase("jojo");
 	}
 
 	@Test
@@ -36,30 +39,12 @@ public class TicketDaoTest extends AbstractTransactionalTestNGSpringContextTests
 		unit.setName("testunit");
 		unit = unitDao.saveUnit(unit);
 		Ticket ticket = new Ticket();
-		ticket.setUsername("testUsername");
-		ticket.setUserFirstName("testuser");
-		ticket.setUserLastName("testuserln");
-		ticket.setCurrentProgress(1);
-		ticket.setEmail("googl@csajsj.com");
+		ticket.setCreatedBy(userDao.getUser(1l));
 		ticket.setSubject("subject");
-		ticket.setStartDate(new Date());
+		ticket.setCreatedForEmail("googl@csajsj.com");
+		ticket.setDateCreated(new Date());
 		ticket.setUnit(unit);
 		ticket = ticketDao.saveTicket(ticket);
-		assert ticketDao.getTickets(unit).size()>=1;
+		assert ticketDao.getTicketsAssignedTo(unit).size() >= 1;
 	}
-	
-	@Test
-	public void saveTicket() {
-		Ticket ticket = new Ticket();
-		ticket.setUsername("testUsername");
-		ticket.setUserFirstName("testuser");
-		ticket.setUserLastName("testuserln");
-		ticket.setCurrentProgress(1);
-		ticket.setEmail("googl@csajsj.com");
-		ticket.setSubject("subject");
-		ticket.setStartDate(new Date());
-		ticket = ticketDao.saveTicket(ticket);
-		assert ticket.getId() != 0;
-	}
-
 }

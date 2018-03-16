@@ -12,10 +12,14 @@ public interface TicketDao {
 
 	List<Ticket> getTickets();
 
-	Ticket saveTicket(Ticket ticket);
-	
-	List<Ticket> getTickets(Unit unit);
+	List<Ticket> getTicketsCreatedBy(User user);
 
-	// Can be fetched from User obj
-//	List<Ticket> getTickets(User technician);
+	List<Ticket> getTicketsCreatedFor(String email);
+
+	List<Ticket> getTicketsAssignedTo(Unit unit);
+
+	List<Ticket> getTocketsAssignedTo(User technician);
+
+	Ticket saveTicket(Ticket ticket);
+
 }

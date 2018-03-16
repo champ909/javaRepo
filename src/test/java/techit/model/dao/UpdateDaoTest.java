@@ -1,5 +1,7 @@
 package techit.model.dao;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
@@ -18,10 +20,14 @@ public class UpdateDaoTest extends AbstractTransactionalTestNGSpringContextTests
 	@Autowired
 	TicketDao ticketDao;
 
+	@Autowired
+	UserDao userDao;
+
 	Long updateId;
+
 	@Test
 	public void getUpdate() {
-		assert updateDao.getUpdate(updateId).getModifier().equalsIgnoreCase("modifierTest");
+		assert updateDao.getUpdate(updateId).getTechnician().getUsername().equalsIgnoreCase("techit");
 	}
 
 	@Test
@@ -37,9 +43,9 @@ public class UpdateDaoTest extends AbstractTransactionalTestNGSpringContextTests
 	@BeforeClass
 	public void saveUpdate() {
 		Update update = new Update();
-		update.setModifier("modifierTest");
-		update.setUpdateDetails("test details");
-		update.setModifiedDate("12-08-2017");
+		update.setTechnician(userDao.getUser(1l));
+		update.setDetails("test details");
+		update.setDate(new Date());
 		update.setTicket(ticketDao.getTicket(1L));
 		update = updateDao.saveUpdate(update);
 		updateId = update.getId();

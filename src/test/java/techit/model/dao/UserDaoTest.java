@@ -34,13 +34,12 @@ public class UserDaoTest extends AbstractTransactionalTestNGSpringContextTests {
 	@Test
 	public void saveUser() {
 		User user = new User();
-		user.setUsername("Tom"+new Date().toString());
-		user.setPass("abcd");
+		user.setUsername("Tom" + new Date().toString());
+		user.setPassword("abcd");
 		user.setEmail("googl@csajsj.com");
 		user.setDepartment("Cs departmetnasda");
 		user.setEnabled(true);
-		user.setPhone("6264640003");
-		user.setStatus(0);
+		user.setPhone("6262029379");
 		user.setFirstName("jay");
 		user.setLastName("patel");
 		user = userDao.saveUser(user);

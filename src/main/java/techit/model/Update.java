@@ -1,8 +1,8 @@
 package techit.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -14,34 +14,22 @@ import javax.persistence.Table;
 public class Update implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue
 	private Long id;
-	
+
 	@ManyToOne
 	private Ticket ticket;
 
-	@Column(nullable=false)
-	private String modifier; // modifier's username
+	@ManyToOne
+	private User technician;
 
-	@Column(nullable = false)
-	private String updateDetails;
-	
-	@Column(nullable=false)
-	private String modifiedDate;
+	private String details;
+
+	private Date date;
 
 	public Update() {
-		
-	}
-	
-	public Update(Long id, Ticket ticket, String modifier, String updateDetails, String modifiedDate) {
-		super();
-		this.id = id;
-		this.ticket = ticket;
-		this.modifier = modifier;
-		this.updateDetails = updateDetails;
-		this.modifiedDate = modifiedDate;
 	}
 
 	public Long getId() {
@@ -60,28 +48,28 @@ public class Update implements Serializable {
 		this.ticket = ticket;
 	}
 
-	public String getModifier() {
-		return modifier;
+	public User getTechnician() {
+		return technician;
 	}
 
-	public void setModifier(String modifier) {
-		this.modifier = modifier;
+	public void setTechnician(User technician) {
+		this.technician = technician;
 	}
 
-	public String getUpdateDetails() {
-		return updateDetails;
+	public String getDetails() {
+		return details;
 	}
 
-	public void setUpdateDetails(String updateDetails) {
-		this.updateDetails = updateDetails;
+	public void setDetails(String details) {
+		this.details = details;
 	}
 
-	public String getModifiedDate() {
-		return modifiedDate;
+	public Date getDate() {
+		return date;
 	}
 
-	public void setModifiedDate(String modifiedDate) {
-		this.modifiedDate = modifiedDate;
+	public void setDate(Date date) {
+		this.date = date;
 	}
-	
+
 }

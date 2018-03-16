@@ -1,8 +1,8 @@
-SET FOREIGN_KEY_CHECKS=0;
-drop table hibernate_sequence;
-drop table users_tickets;
-drop table units;
-drop table tickets;
 drop table updates;
+drop table ticket_technicians;
+drop table tickets;
+drop table unit_technicians;
+drop table unit_supervisors;
 drop table users;
-SET FOREIGN_KEY_CHECKS=1;
+drop table units;
+drop table hibernate_sequence;
