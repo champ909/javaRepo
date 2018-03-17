@@ -12,6 +12,7 @@
          
         <!-- Vue.js 2.5.16 CDN -->
         <script src="https://unpkg.com/vue"></script>
+        <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
     </head>
 
     <body>
@@ -81,8 +82,85 @@
                                     <td style="width: 65%">{{endpoint.ResponseStatus}}</td>
                                 </tr>
                                 <tr v-if="endpoint.ResponseBody">
-                                        <th style="width: 35%">Response Body</th>
-                                        <td style="width: 65%">{{endpoint.ResponseBody}}</td>
+                                    <th style="width: 35%">Response Body</th>
+                                    <td style="width: 65%">{{endpoint.ResponseBody}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li><b>Update a Ticket</b>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%">URL</th>
+                                    <td style="width: 65%">/ticket/</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Method</th>
+                                    <td style="width: 65%">PUT</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Request Body</th>
+                                    <td style="width: 65%">
+                                        <code class="prettyprint">{{updateTicketRequestBodyJSON}}</code>
+                                        <br/><b>Available field values:</b> {{updateTicketRequestBodyFieldValues}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Response Status</th>
+                                    <td style="width: 65%">200 if the operation is successful; otherwise an error status code.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li><b>Search a Ticket</b>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%">URL</th>
+                                    <td style="width: 65%">/search/ticket/</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Method</th>
+                                    <td style="width: 65%">POST</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Request Body</th>
+                                    <td style="width: 65%">
+                                        <code class="prettyprint">{{searchTicketRequestBodyJSON}}</code>
+                                        <br/><b>Available field values:</b> {{updateTicketRequestBodyFieldValues}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Response Body</th>
+                                    <td style="width: 65%">An array of matching Ticket objects..</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li><b>Assign a Ticket to the technician</b>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%">URL</th>
+                                    <td style="width: 65%">/ticket/assign/</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Method</th>
+                                    <td style="width: 65%">POST</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Request Body</th>
+                                    <td style="width: 65%">
+                                        <code class="prettyprint">{
+                                                "ticket":"1",
+                                                "technician":2
+                                            }</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Response Status</th>
+                                    <td style="width: 65%">200 if the operation is successful; otherwise an error status code.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -166,10 +244,17 @@
                     el: "#endpointController",
 
                     data: {
+                        // For update Ticket - POST /ticket/ request body:
+                        updateTicketRequestBodyJSON: JSON.stringify({"ticket": {"id" : 1,"status" : "ONHOLD"},"modifiedBy":1,"details": "test details"}),
+                        updateTicketRequestBodyFieldValues: "createdForName, createdForEmail, createdForPhone, createdForDepartment, subject, details, location, unit, status, priority",
+                        // For search Ticket - POST /search/ticket request body:
+                        searchTicketRequestBodyJSON: JSON.stringify([{"type":"CONTAINS","field":"createdForName","value":"Doe"},{"type":"CONTAINS","field":"createdForDepartment","value":"CS"}]),
+                        
                         /* To add a new endpoint for {X}:
                          *      - Add an object to the array '{X}Endpoint' in format:
                          *          {name:"", URL:"", Method:"", RequestBody:"", [optional:ResponseStatus:"", ResponseBody:""]}
                          */
+                         
                         userEndpoints: [
                             {name:"Get all users", URL:"/user/", Method:"GET", ResponseBody:"An array of User objects."},
                             {name:"Get a user", URL:"/user/{id}", Method:"GET", ResponseBody:"A User object with the given id."},
@@ -178,9 +263,9 @@
                         ],
 
                         ticketEndpoints: [
-                            {name:"Get all ticekts", URL:"/ticket/", Method:"GET", ResponseBody:"An array of Ticket objects."},
-                            {name:"Get a ticekt", URL:"/ticket/{id}", Method:"GET", ResponseBody:"A Ticket object with the given id."}
-
+                            {name:"Get all ticketts", URL:"/ticket/", Method:"GET", ResponseBody:"An array of Ticket objects."},
+                            {name:"Get a ticket", URL:"/ticket/{id}", Method:"GET", ResponseBody:"A Ticket object with the given id."},
+                            {name:"Create new ticket", URL:"/ticket/", Method:"POST", RequestBody:"A Ticket Object", ResponseStatus:"200 if the operation is successful; otherwise an error status code."}
                         ],
 
                         unitEndpoints: [
