@@ -12,14 +12,7 @@ import org.springframework.stereotype.Repository;
 import techit.model.Ticket;
 import techit.model.dao.TicketDao;
 
-@Repository
 public class SearchableCriteria {
-
-	@PersistenceContext
-	private EntityManager entityManager;
-
-	@Autowired
-	TicketDao ticketDao;
 
 	public enum Type {
 		CONTAINS, EQUALS
