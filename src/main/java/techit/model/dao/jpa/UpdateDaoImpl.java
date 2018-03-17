@@ -30,7 +30,7 @@ public class UpdateDaoImpl implements UpdateDao {
 
 	@Override
 	public List<Update> getUpdates(Ticket ticket, boolean orderByLastUpdate) {
-		String query = "from Update where ticket =:ticket" + (orderByLastUpdate ? " order by modifiedDate" : "");
+		String query = "from Update where ticket =:ticket" + (orderByLastUpdate ? " order by date" : "");
 		return entityManager.createQuery(query, Update.class).setParameter("ticket", ticket).getResultList();
 	}
 
