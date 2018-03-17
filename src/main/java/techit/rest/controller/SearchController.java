@@ -26,8 +26,6 @@ public class SearchController {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	private SearchableCriteria searchUtil = new SearchableCriteria();
-
 	@RequestMapping(value = "/search/ticket/", method = RequestMethod.POST)
 	public List<Ticket> searchTickets(@RequestBody List<SearchableCriteria> criteriaList) {
 

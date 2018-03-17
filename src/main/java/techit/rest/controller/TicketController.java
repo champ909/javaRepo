@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import techit.model.Ticket;
+import techit.model.Unit;
 import techit.model.Update;
 import techit.model.User;
 import techit.model.dao.TicketDao;
@@ -44,6 +45,16 @@ public class TicketController {
 	@RequestMapping(value = "/ticket/", method = RequestMethod.GET)
 	public List<Ticket> getTickets() {
 		return ticketDao.getTickets();
+	}
+
+	@RequestMapping(value = "/ticket/", method = RequestMethod.POST)
+	public Ticket addTicket(@RequestBody Ticket ticket) {
+		if (StringUtils.isEmpty(ticket.getCreatedBy()) || StringUtils.isEmpty(ticket.getCreatedForEmail())
+				|| StringUtils.isEmpty(ticket.getSubject()) || StringUtils.isEmpty(ticket.getUnit()))
+			throw new RestException(400, "Missing CreatedBy, CreatedForEmail, Subject or Unit.");
+
+		
+		return ticketDao.saveTicket(ticket);
 	}
 
 	@RequestMapping(value = "/ticket/assign", method = RequestMethod.POST)
