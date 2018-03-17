@@ -14,6 +14,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
@@ -38,10 +39,12 @@ public class Unit implements Serializable {
 
 	private String description;
 
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "unit_supervisors", joinColumns = @JoinColumn(name = "unit_id"), inverseJoinColumns = @JoinColumn(name = "supervisor_id"))
 	private List<User> supervisors;
 
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "unit_technicians", joinColumns = @JoinColumn(name = "unit_id"), inverseJoinColumns = @JoinColumn(name = "technician_id"))
 	private List<User> technicians;
