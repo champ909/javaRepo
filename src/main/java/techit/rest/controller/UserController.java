@@ -34,6 +34,8 @@ public class UserController {
 		if (user.getId() == null)
 			throw new RestException(400, "Missing username and/or password.");
 
+		User userObj = userDao.getUser(user.getId());
+		user.setPassword(userObj.getPassword());
 		return userDao.saveUser(user);
 	}
 
