@@ -1,5 +1,6 @@
 package techit.rest.controller;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -15,8 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.google.gson.JsonObject;
+
 import techit.model.Ticket;
-import techit.model.Unit;
+import techit.model.Ticket.Status;
 import techit.model.Update;
 import techit.model.User;
 import techit.model.dao.TicketDao;
@@ -53,7 +58,6 @@ public class TicketController {
 				|| StringUtils.isEmpty(ticket.getSubject()) || StringUtils.isEmpty(ticket.getUnit()))
 			throw new RestException(400, "Missing CreatedBy, CreatedForEmail, Subject or Unit.");
 
-		
 		return ticketDao.saveTicket(ticket);
 	}
 
@@ -68,12 +72,14 @@ public class TicketController {
 		if (ticket == null || tech == null)
 			throw new RestException(404, "Bad Request: No such Technician or Ticket found");
 
+		Date date = Calendar.getInstance().getTime();
 		List<User> techs = ticket.getTechnicians();
 		techs.add(tech);
 		ticket.setTechnicians(techs);
+		ticket.setDateAssigned(date);
+		ticket.setDateUpdated(date);
 
 		Update update = new Update();
-		Date date = Calendar.getInstance().getTime();
 		update.setDate(date);
 		update.setDetails("Ticket ID:" + ticket.getId() + " assigned to User:" + tech.getUsername());
 		update.setTechnician(tech);
@@ -93,9 +99,10 @@ public class TicketController {
 			throw new RestException(404, "Bad Request: Details, Technician or Ticket not found");
 
 		User user = userDao.getUser(Long.parseLong(update.get("modifiedBy").toString()));
-		Ticket newTicket = GsonUtil.getInstance().fromJson(update.get("ticket").toString(), Ticket.class);
+		Ticket newTicket = GsonUtil.fromJson(update.get("ticket").toString(), Ticket.class);
 
 		Ticket ticket = ticketDao.getTicket(newTicket.getId());
+		Date date = Calendar.getInstance().getTime();
 
 		if (user == null || ticket == null)
 			throw new RestException(404, "Bad Request: No such User or Ticket found");
@@ -124,11 +131,15 @@ public class TicketController {
 					StringUtils.isEmpty(newTicket.getLocation()) ? ticket.getLocation() : newTicket.getLocation());
 			ticket.setUnit(StringUtils.isEmpty(newTicket.getUnit()) ? ticket.getUnit() : newTicket.getUnit());
 			ticket.setStatus(StringUtils.isEmpty(newTicket.getStatus()) ? ticket.getStatus() : newTicket.getStatus());
+			if (!StringUtils.isEmpty(newTicket.getStatus())) {
+				ticket.setStatus(newTicket.getStatus());
+				if (newTicket.getStatus().equals(Status.CLOSED))
+					ticket.setDateClosed(date);
+			}
 			ticket.setPriority(
 					StringUtils.isEmpty(newTicket.getPriority()) ? ticket.getPriority() : newTicket.getPriority());
 		}
 
-		Date date = Calendar.getInstance().getTime();
 		ticket.setDateUpdated(date);
 
 		Update newUpdate = new Update();
