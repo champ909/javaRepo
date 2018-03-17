@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <title>TechIT::API Docs</title>
+        
+        <!-- Bootstrap 4.0.0 min version CSS CDN -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+         
+        <!-- Vue.js 2.5.16 CDN -->
+        <script src="https://unpkg.com/vue"></script>
+    </head>
+
+    <body>
+        <div class="container-fluid">
+            
+            <!-- Header Section -->
+            <div class="jumbotron text-center headersection">
+                <h1 class="headerh1">CS5220 - TechIT ReST API Doc</small></h1>
+            </div>
+
+            <!-- Enpoint Controller -->
+            <div class="container" id="endpointController">
+                    
+                <!-- User Controller -->
+                <h2>User Endpoints</h2>
+                <ol>
+                    <li v-for="endpoint in userEndpoints" v-bind:value="endpoint"><b>{{ endpoint.name }}</b>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%">URL</th>
+                                    <td style="width: 65%">{{endpoint.URL}}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Method</th>
+                                    <td style="width: 65%">{{endpoint.Method}}</td>
+                                </tr>
+                                <tr v-if="endpoint.RequestBody">
+                                    <th style="width: 35%">Request Body</th>
+                                    <td style="width: 65%">{{endpoint.RequestBody}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseStatus">
+                                    <th style="width: 35%">Response Status</th>
+                                    <td style="width: 65%">{{endpoint.ResponseStatus}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseBody">
+                                        <th style="width: 35%">Response Body</th>
+                                        <td style="width: 65%">{{endpoint.ResponseBody}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </ol>
+                <hr/>
+                <!-- User Controller -->
+
+                <!-- Ticket Controller -->
+                <h2>Ticket Endpoints</h2>
+                <ol>
+                    <li v-for="endpoint in ticketEndpoints" v-bind:value="endpoint"><b>{{ endpoint.name }}</b>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%">URL</th>
+                                    <td style="width: 65%">{{endpoint.URL}}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Method</th>
+                                    <td style="width: 65%">{{endpoint.Method}}</td>
+                                </tr>
+                                <tr v-if="endpoint.RequestBody">
+                                    <th style="width: 35%">Request Body</th>
+                                    <td style="width: 65%">{{endpoint.RequestBody}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseStatus">
+                                    <th style="width: 35%">Response Status</th>
+                                    <td style="width: 65%">{{endpoint.ResponseStatus}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseBody">
+                                        <th style="width: 35%">Response Body</th>
+                                        <td style="width: 65%">{{endpoint.ResponseBody}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </ol>
+                <hr/>
+                <!-- Ticket Controller -->
+
+                <!-- Unit Controller -->
+                <h2>Unit Endpoints</h2>
+                <ol>
+                    <li v-for="endpoint in unitEndpoints" v-bind:value="endpoint"><b>{{ endpoint.name }}</b>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%">URL</th>
+                                    <td style="width: 65%">{{endpoint.URL}}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Method</th>
+                                    <td style="width: 65%">{{endpoint.Method}}</td>
+                                </tr>
+                                <tr v-if="endpoint.RequestBody">
+                                    <th style="width: 35%">Request Body</th>
+                                    <td style="width: 65%">{{endpoint.RequestBody}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseStatus">
+                                    <th style="width: 35%">Response Status</th>
+                                    <td style="width: 65%">{{endpoint.ResponseStatus}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseBody">
+                                        <th style="width: 35%">Response Body</th>
+                                        <td style="width: 65%">{{endpoint.ResponseBody}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </ol>
+                <hr/>
+                <!-- Unit Controller -->
+
+                <!-- Update Controller -->
+                <h2>Update Endpoints</h2>
+                <ol>
+                    <li v-for="endpoint in updateEndpoints" v-bind:value="endpoint"><b>{{ endpoint.name }}</b>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%">URL</th>
+                                    <td style="width: 65%">{{endpoint.URL}}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 35%">Method</th>
+                                    <td style="width: 65%">{{endpoint.Method}}</td>
+                                </tr>
+                                <tr v-if="endpoint.RequestBody">
+                                    <th style="width: 35%">Request Body</th>
+                                    <td style="width: 65%">{{endpoint.RequestBody}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseStatus">
+                                    <th style="width: 35%">Response Status</th>
+                                    <td style="width: 65%">{{endpoint.ResponseStatus}}</td>
+                                </tr>
+                                <tr v-if="endpoint.ResponseBody">
+                                        <th style="width: 35%">Response Body</th>
+                                        <td style="width: 65%">{{endpoint.ResponseBody}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </ol>
+                <hr/>
+                <!-- Update Controller -->
+        
+            </div>
+            <!-- Enpoint Controller -->
+
+            <!-- app.js - Vue.js instance implementation -->
+            <script type="text/javascript">
+                let userControllerViewModel = new Vue({
+                    el: "#endpointController",
+
+                    data: {
+                        /* To add a new endpoint for {X}:
+                         *      - Add an object to the array '{X}Endpoint' in format:
+                         *          {name:"", URL:"", Method:"", RequestBody:"", [optional:ResponseStatus:"", ResponseBody:""]}
+                         */
+                        userEndpoints: [
+                            {name:"Get all users", URL:"/user/", Method:"GET", ResponseBody:"An array of User objects."},
+                            {name:"Get a user", URL:"/user/{id}", Method:"GET", ResponseBody:"A User object with the given id."},
+                            {name:"Update a user", URL:"/user/", Method:"PUT", RequestBody:"A User Object", ResponseStatus:"200 if the operation is successful; otherwise an error status code."},
+                            {name:"Create new user", URL:"/user/", Method:"POST", RequestBody:"A User Object", ResponseStatus:"200 if the operation is successful; otherwise an error status code."}
+                        ],
+
+                        ticketEndpoints: [
+                            {name:"Get all ticekts", URL:"/ticket/", Method:"GET", ResponseBody:"An array of Ticket objects."},
+                            {name:"Get a ticekt", URL:"/ticket/{id}", Method:"GET", ResponseBody:"A Ticket object with the given id."}
+
+                        ],
+
+                        unitEndpoints: [
+                            {name:"Get all units", URL:"/unit/", Method:"GET", ResponseBody:"An array of Unit objects."},
+                            {name:"Get a unit", URL:"/unit/{id}", Method:"GET", ResponseBody:"A Unit object with given id."},
+                            {name:"Update a unit", URL:"/unit/", Method:"PUT", RequestBody:"A Unit Object", ResponseStatus:"200 if the operation is successful; otherwise an error status code."},
+                            {name:"Create new user", URL:"/unit/", Method:"POST", RequestBody:"A Unit Object", ResponseStatus:"200 if the operation is successful; otherwise an error status code."},
+                        ],
+
+                        updateEndpoints: [
+                            {name:"Get all updates for a Ticket", URL:"/update/{ticketId}", Method:"GET", ResponseBody:"An array of ordered Update objects for given Ticket Id."},
+                            {name:"Get all update for a Ticket in specified order", URL:"/update/{ticketId}/{orderBy}", Method:"GET", ResponseBody:"An array of Update objects for given Ticket Id in specified order."},
+                        ]
+                    }
+                })
+            </script>
+        </div>
+    </body>
+
+</html>
