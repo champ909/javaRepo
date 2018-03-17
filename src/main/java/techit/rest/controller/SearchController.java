@@ -2,6 +2,8 @@ package techit.rest.controller;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class SearchController {
 
 	@Autowired
 	private TicketDao ticketDao;
+
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	private SearchableCriteria searchUtil = new SearchableCriteria();
 
@@ -41,11 +46,11 @@ public class SearchController {
 			queryString += criteria.getField();
 			switch (criteria.getType()) {
 			case CONTAINS:
-				queryString += " LIKE %:" + criteria.getField() + "%";
+				queryString += " LIKE CONCAT('%', \'" + criteria.getValue() + "\' ,'%')";
 				break;
 
 			case EQUALS:
-				queryString += " = :" + criteria.getField();
+				queryString += " = " + criteria.getValue();
 				break;
 			}
 			total--;
@@ -53,20 +58,18 @@ public class SearchController {
 				queryString += " and ";
 		}
 
-		// Query query;
-		// try {
-		// query = entityManager.createQuery(queryString, entity);
-		// for (SearchableCriteria criteria : criteriaList) {
-		// query.setParameter(criteria.field, criteria.value);
-		// }
-		//
-		// return query.getResultList();
-		// }catch(Exception e) {
-		// e.printStackTrace();
-		// return null;
-		// }
+		Query query;
+		try {
+			query = entityManager.createQuery(queryString, entity);
+//			for (SearchableCriteria criteria : criteriaList) {
+//				query.setParameter(criteria.field, criteria.value);
+//			}
 
-		return ticketDao.getSearchResults(queryString, entity, criteriaList);
+			return query.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

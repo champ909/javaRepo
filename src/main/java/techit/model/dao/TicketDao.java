@@ -22,6 +22,4 @@ public interface TicketDao {
 	List<Ticket> getTocketsAssignedTo(User technician);
 
 	Ticket saveTicket(Ticket ticket);
-
-	<T extends Object> List<T> getSearchResults(String query, Class<T> entity, List<SearchableCriteria> criteriaList);
 }

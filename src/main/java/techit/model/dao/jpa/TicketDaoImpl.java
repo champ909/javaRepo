@@ -70,25 +70,4 @@ public class TicketDaoImpl implements TicketDao {
 		return entityManager.merge(ticket);
 	}
 
-	@Override
-	public <T> List<T> getSearchResults(String queryString, Class<T> entity, List<SearchableCriteria> criteriaList) {
-		Query query;
-		try {
-			query = entityManager.createQuery(queryString, entity);
-			Field[] fields = entity.getDeclaredFields();
-			Map<String, Class> map = new HashMap<>();
-			for (Field field : fields) {
-				map.put(field.getName(), field.getClass());
-			}
-			for (SearchableCriteria criteria : criteriaList) {
-				query.setParameter(criteria.getField(), criteria.getValue());
-			}
-			return query.getResultList();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ArrayList<T>();
-		}
-
-	}
-
 }
