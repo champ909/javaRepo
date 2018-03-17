@@ -31,18 +31,18 @@ public class UnitController {
 
 	@RequestMapping(value = "/unit/", method = RequestMethod.PUT)
 	public Unit updateUnit(@RequestBody Unit unit) {
-		if ( unit.getId() == null || unit.getName() == null )
+		if (unit.getId() == null || unit.getName() == null)
 			throw new RestException(400, "Missing Unit id and/or name field.");
-		
+
 		return unitDao.saveUnit(unit);
 	}
-	
+
 	@RequestMapping(value = "/unit/", method = RequestMethod.POST)
 	public Unit addUnit(@RequestBody Unit unit) {
-		if ( unit.getName() == null )
+		if (unit.getName() == null)
 			throw new RestException(400, "Missing Unit name field.");
-		
+
 		return unitDao.saveUnit(unit);
 	}
-	
+
 }

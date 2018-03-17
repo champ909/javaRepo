@@ -18,6 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "tickets")
 public class Ticket implements Serializable {
@@ -63,10 +65,12 @@ public class Ticket implements Serializable {
 	@JoinColumn(nullable = false)
 	private Unit unit;
 
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "ticket_technicians", joinColumns = @JoinColumn(name = "ticket_id"), inverseJoinColumns = @JoinColumn(name = "technician_id"))
 	private List<User> technicians;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "ticket")
 	private List<Update> updates;
 

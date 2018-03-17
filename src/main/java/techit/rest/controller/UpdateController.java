@@ -12,18 +12,18 @@ import techit.model.dao.UpdateDao;
 
 @RestController
 public class UpdateController {
-	
+
 	@Autowired
 	UpdateDao updateDao;
-	
+
 	@Autowired
 	TicketDao ticketDao;
-	
+
 	@RequestMapping(value = "/update/{ticketId}", method = RequestMethod.GET)
 	public List<Update> getUpdate(@PathVariable Long ticketId) {
 		return updateDao.getUpdates(ticketDao.getTicket(ticketId), true);
 	}
-	
+
 	@RequestMapping(value = "/update/{ticketId}/{orderBy}", method = RequestMethod.GET)
 	public List<Update> getUpdateOrderBy(@PathVariable Long ticketId, @PathVariable boolean orderBy) {
 		return updateDao.getUpdates(ticketDao.getTicket(ticketId), orderBy);

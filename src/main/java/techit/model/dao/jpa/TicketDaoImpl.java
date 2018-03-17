@@ -1,9 +1,15 @@
 package techit.model.dao.jpa;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +18,7 @@ import techit.model.Ticket;
 import techit.model.Unit;
 import techit.model.User;
 import techit.model.dao.TicketDao;
+import techit.util.SearchableCriteria;
 
 @Repository
 public class TicketDaoImpl implements TicketDao {
@@ -61,6 +68,27 @@ public class TicketDaoImpl implements TicketDao {
 	@Transactional
 	public Ticket saveTicket(Ticket ticket) {
 		return entityManager.merge(ticket);
+	}
+
+	@Override
+	public <T> List<T> getSearchResults(String queryString, Class<T> entity, List<SearchableCriteria> criteriaList) {
+		Query query;
+		try {
+			query = entityManager.createQuery(queryString, entity);
+			Field[] fields = entity.getDeclaredFields();
+			Map<String, Class> map = new HashMap<>();
+			for (Field field : fields) {
+				map.put(field.getName(), field.getClass());
+			}
+			for (SearchableCriteria criteria : criteriaList) {
+				query.setParameter(criteria.getField(), criteria.getValue());
+			}
+			return query.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ArrayList<T>();
+		}
+
 	}
 
 }

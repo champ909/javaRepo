@@ -5,6 +5,7 @@ import java.util.List;
 import techit.model.Ticket;
 import techit.model.Unit;
 import techit.model.User;
+import techit.util.SearchableCriteria;
 
 public interface TicketDao {
 
@@ -22,4 +23,5 @@ public interface TicketDao {
 
 	Ticket saveTicket(Ticket ticket);
 
+	<T extends Object> List<T> getSearchResults(String query, Class<T> entity, List<SearchableCriteria> criteriaList);
 }
