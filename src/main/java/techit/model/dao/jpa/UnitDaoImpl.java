@@ -14,23 +14,27 @@ import techit.model.dao.UnitDao;
 @Repository
 public class UnitDaoImpl implements UnitDao {
 
-	@PersistenceContext
-	private EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-	@Override
-	public Unit getUnit(Long id) {
-		return entityManager.find(Unit.class, id);
-	}
+    @Override
+    public Unit getUnit( Long id )
+    {
+        return entityManager.find( Unit.class, id );
+    }
 
-	@Override
-	public List<Unit> getUnits() {
-		return entityManager.createQuery("from Unit order by id", Unit.class).getResultList();
-	}
+    @Override
+    public List<Unit> getUnits()
+    {
+        return entityManager.createQuery( "from Unit order by id", Unit.class )
+            .getResultList();
+    }
 
-	@Override
-	@Transactional
-	public Unit saveUnit(Unit unit) {
-		return entityManager.merge(unit);
-	}
+    @Override
+    @Transactional
+    public Unit saveUnit( Unit unit )
+    {
+        return entityManager.merge( unit );
+    }
 
 }

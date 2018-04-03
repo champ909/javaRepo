@@ -13,109 +13,123 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 @Entity
 @Table(name = "units")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Unit implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	@Column(nullable = false, unique = true)
-	private String name;
+    @Column(nullable = false, unique = true)
+    private String name;
 
-	private String location;
+    private String location;
 
-	private String email;
+    private String email;
 
-	private String phone;
+    private String phone;
 
-	private String description;
+    private String description;
 
-	@JsonIgnore
-	@ManyToMany
-	@JoinTable(name = "unit_supervisors", joinColumns = @JoinColumn(name = "unit_id"), inverseJoinColumns = @JoinColumn(name = "supervisor_id"))
-	private List<User> supervisors;
+    @ManyToMany
+    @JoinTable(name = "unit_supervisors",
+        joinColumns = @JoinColumn(name = "unit_id"),
+        inverseJoinColumns = @JoinColumn(name = "supervisor_id"))
+    private List<User> supervisors;
 
-	@JsonIgnore
-	@ManyToMany
-	@JoinTable(name = "unit_technicians", joinColumns = @JoinColumn(name = "unit_id"), inverseJoinColumns = @JoinColumn(name = "technician_id"))
-	private List<User> technicians;
+    @ManyToMany
+    @JoinTable(name = "unit_technicians",
+        joinColumns = @JoinColumn(name = "unit_id"),
+        inverseJoinColumns = @JoinColumn(name = "technician_id"))
+    private List<User> technicians;
 
-	public Unit() {
-		supervisors = new ArrayList<User>();
-		technicians = new ArrayList<User>();
-	}
+    public Unit()
+    {
+        supervisors = new ArrayList<User>();
+        technicians = new ArrayList<User>();
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId()
+    {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId( Long id )
+    {
+        this.id = id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName( String name )
+    {
+        this.name = name;
+    }
 
-	public String getLocation() {
-		return location;
-	}
+    public String getLocation()
+    {
+        return location;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public void setLocation( String location )
+    {
+        this.location = location;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail()
+    {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail( String email )
+    {
+        this.email = email;
+    }
 
-	public String getPhone() {
-		return phone;
-	}
+    public String getPhone()
+    {
+        return phone;
+    }
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+    public void setPhone( String phone )
+    {
+        this.phone = phone;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription()
+    {
+        return description;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setDescription( String description )
+    {
+        this.description = description;
+    }
 
-	public List<User> getSupervisors() {
-		return supervisors;
-	}
+    public List<User> getSupervisors()
+    {
+        return supervisors;
+    }
 
-	public void setSupervisors(List<User> supervisors) {
-		this.supervisors = supervisors;
-	}
+    public void setSupervisors( List<User> supervisors )
+    {
+        this.supervisors = supervisors;
+    }
 
-	public List<User> getTechnicians() {
-		return technicians;
-	}
+    public List<User> getTechnicians()
+    {
+        return technicians;
+    }
 
-	public void setTechnicians(List<User> technicians) {
-		this.technicians = technicians;
-	}
+    public void setTechnicians( List<User> technicians )
+    {
+        this.technicians = technicians;
+    }
 
 }

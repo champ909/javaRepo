@@ -13,63 +13,74 @@ import javax.persistence.Table;
 @Table(name = "updates")
 public class Update implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	@ManyToOne
-	private Ticket ticket;
+    @ManyToOne
+    private Ticket ticket;
 
-	@ManyToOne
-	private User technician;
+    @ManyToOne
+    private User technician;
 
-	private String details;
+    private String details;
 
-	private Date date;
+    private Date date;
 
-	public Update() {
-	}
+    public Update()
+    {
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId()
+    {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId( Long id )
+    {
+        this.id = id;
+    }
 
-	public Ticket getTicket() {
-		return ticket;
-	}
+    public Ticket getTicket()
+    {
+        return ticket;
+    }
 
-	public void setTicket(Ticket ticket) {
-		this.ticket = ticket;
-	}
+    public void setTicket( Ticket ticket )
+    {
+        this.ticket = ticket;
+    }
 
-	public User getTechnician() {
-		return technician;
-	}
+    public User getTechnician()
+    {
+        return technician;
+    }
 
-	public void setTechnician(User technician) {
-		this.technician = technician;
-	}
+    public void setTechnician( User technician )
+    {
+        this.technician = technician;
+    }
 
-	public String getDetails() {
-		return details;
-	}
+    public String getDetails()
+    {
+        return details;
+    }
 
-	public void setDetails(String details) {
-		this.details = details;
-	}
+    public void setDetails( String details )
+    {
+        this.details = details;
+    }
 
-	public Date getDate() {
-		return date;
-	}
+    public Date getDate()
+    {
+        return date;
+    }
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
+    public void setDate( Date date )
+    {
+        this.date = date;
+    }
 
 }

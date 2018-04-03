@@ -6,10 +6,10 @@ import techit.model.Unit;
 
 public interface UnitDao {
 
-	Unit getUnit(Long id);
+    Unit getUnit( Long id );
 
-	List<Unit> getUnits();
+    List<Unit> getUnits();
 
-	Unit saveUnit(Unit unit);
+    Unit saveUnit( Unit unit );
 
 }

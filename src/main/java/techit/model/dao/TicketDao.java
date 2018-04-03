@@ -5,21 +5,21 @@ import java.util.List;
 import techit.model.Ticket;
 import techit.model.Unit;
 import techit.model.User;
-import techit.util.SearchableCriteria;
 
 public interface TicketDao {
 
-	Ticket getTicket(Long id);
+    Ticket getTicket( Long id );
 
-	List<Ticket> getTickets();
+    List<Ticket> getTickets();
 
-	List<Ticket> getTicketsCreatedBy(User user);
+    List<Ticket> getTicketsCreatedBy( User user );
 
-	List<Ticket> getTicketsCreatedFor(String email);
+    List<Ticket> getTicketsCreatedFor( String email );
 
-	List<Ticket> getTicketsAssignedTo(Unit unit);
+    List<Ticket> getTicketsAssignedTo( Unit unit );
 
-	List<Ticket> getTocketsAssignedTo(User technician);
+    List<Ticket> getTocketsAssignedTo( User technician );
 
-	Ticket saveTicket(Ticket ticket);
+    Ticket saveTicket( Ticket ticket );
+
 }
