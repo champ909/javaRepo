@@ -10,15 +10,15 @@ import java.util.Map;
  * @param <K>
  * @param <V>
  */
-public class ResponseMap<K, V> {
+public class PropMap<K, V> {
 
 	private Map<K, V> map;
 
-	public ResponseMap() {
+	public PropMap() {
 		this.map = new LinkedHashMap<>();
 	}
 
-	public ResponseMap<K, V> put(K key, V value) {
+	public PropMap<K, V> put(K key, V value) {
 		map.put(key, value);
 		return this;
 	}

@@ -16,7 +16,7 @@ import techit.model.User;
 import techit.model.dao.UserDao;
 import techit.rest.error.RestException;
 import techit.util.JwtSignatureUtil;
-import techit.util.ResponseMap;
+import techit.util.PropMap;
 
 @RestController
 public class LoginController {
@@ -35,7 +35,7 @@ public class LoginController {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 		if (encoder.matches(password, userObj.getHash()))
-			return new ResponseMap<String, Object>().put("success", true)
+			return new PropMap<String, Object>().put("success", true)
 					.put("jwt", JwtSignatureUtil.generateToken(userObj)).getMap();
 		else
 			throw new RestException(400, "Wrong username and/or password.");
