@@ -51,7 +51,7 @@ public class Unit implements Serializable {
         supervisors = new ArrayList<User>();
         technicians = new ArrayList<User>();
     }
-
+    
     public Long getId()
     {
         return id;

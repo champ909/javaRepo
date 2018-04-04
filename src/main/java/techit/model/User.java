@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -69,6 +70,12 @@ public class User implements Serializable {
     {
     }
 
+    @JsonCreator
+    public User(@JsonProperty("unitId") long unitId) {
+        this.unit = new Unit();
+        this.unit.setId(unitId);
+    }
+    
     // Use unitId instead of unit in serialization
     public Long getUnitId()
     {
