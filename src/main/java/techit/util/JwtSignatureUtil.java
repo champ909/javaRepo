@@ -3,6 +3,10 @@ package techit.util;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.Key;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -24,6 +28,7 @@ public class JwtSignatureUtil {
 	private static Key key;
 	private static String secretKey;// = "thisis16charkey"; // can be configured in a configuration file
 	private static String issuer = "TechIT2"; // can be configured in a configuration file
+	private static int expirationTime = 3600; // in seconds
 
 	static {
 		Resource resource = new ClassPathResource("key.txt");
@@ -37,19 +42,24 @@ public class JwtSignatureUtil {
 	}
 
 	public static String generateToken(User user) {
-		return Jwts.builder().setSubject(user.getUsername()).setIssuer(issuer).signWith(SignatureAlgorithm.HS512, key)
-				.compact();
+		Map<String, Object> claims = new PropMap<String, Object>()
+				.put("id", user.getId())
+				.put("username", user.getUsername())
+				.getMap();
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.SECOND, expirationTime);
+		return Jwts.builder().setClaims(claims).setIssuer(issuer).setExpiration(cal.getTime())
+				.signWith(SignatureAlgorithm.HS512, key).compact();
 	}
 
-	public static String verifyToken(String token) {
-		String username = null;
+	public static Claims verifyToken(String token) {
 		try {
 			Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
 			if (claims.getIssuer().equals(issuer))
-				username = claims.getSubject();
+				return claims;
 		} catch (Exception e) {
 			logger.warn("Invalid JWT:" + e.getMessage());
 		}
-		return username;
+		return null;
 	}
 }

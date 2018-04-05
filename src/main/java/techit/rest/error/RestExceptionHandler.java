@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import io.jsonwebtoken.Claims;
 import techit.model.User;
 import techit.model.dao.UserDao;
 import techit.util.JwtSignatureUtil;
@@ -19,9 +20,9 @@ import techit.util.JwtSignatureUtil;
 public class RestExceptionHandler {
 
 	private static Logger logger = LogManager.getLogger(RestExceptionHandler.class);
-	
-    @Autowired
-    UserDao userDao;
+
+	@Autowired
+	UserDao userDao;
 
 	@ExceptionHandler(RestException.class)
 	public ResponseEntity<Object> handleRestExceptions(RestException ex) {
@@ -34,16 +35,19 @@ public class RestExceptionHandler {
 		logger.error("General Error", ex);
 		return new ResponseEntity<Object>(new RestError(500, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
 	@ModelAttribute("currentUser")
-	public User getUserFromJwt(@RequestHeader(name="Authorization", defaultValue="NoAuth") String auth) {
-		if (StringUtils.isEmpty(auth)||!auth.contains("Bearer "))
-			return null;
-		
-		String username = JwtSignatureUtil.verifyToken(auth.substring(7));
-		if (StringUtils.isEmpty(username))
+	public User getUserFromJwt(@RequestHeader(name = "Authorization", defaultValue = "NoAuth") String auth) {
+		if (StringUtils.isEmpty(auth) || !auth.contains("Bearer "))
 			return null;
 
-		return userDao.getUser(username);
+		Claims claims = JwtSignatureUtil.verifyToken(auth.substring(7));
+		if (claims == null)
+			return null;
+
+		User u = new User();
+		u.setId(claims.get("id", Long.class));
+		u.setUsername(claims.get("username", String.class));
+		return u;
 	}
 }

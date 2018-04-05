@@ -42,12 +42,12 @@ class UserControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 	@BeforeClass
 	void setup() throws UnsupportedEncodingException, Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-		String res = this.mockMvc.perform(post("/login").content("{\"username\":\"techit\",\"password\":\"abcd\"}")
-				.contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse().getContentAsString();
+		String res = this.mockMvc.perform(post("/login").content("username=techit&password=abcd")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)).andReturn().getResponse().getContentAsString();
 		adminToken = new ObjectMapper().readTree(res).get("jwt").textValue();
 
-		res = this.mockMvc.perform(post("/login").content("{\"username\":\"jojo\",\"password\":\"abcd\"}")
-				.contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse().getContentAsString();
+		res = this.mockMvc.perform(post("/login").content("username=jojo&password=abcd")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)).andReturn().getResponse().getContentAsString();
 		regularUserToken = new ObjectMapper().readTree(res).get("jwt").textValue();
 	}
 
