@@ -1,34 +1,29 @@
 package techit.rest.controller;
 
-import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.gson.JsonObject;
-
 import techit.model.Ticket;
+import techit.model.Ticket.Priority;
 import techit.model.Ticket.Status;
+import techit.model.Unit;
 import techit.model.Update;
 import techit.model.User;
+import techit.model.User.Type;
 import techit.model.dao.TicketDao;
 import techit.model.dao.UpdateDao;
 import techit.model.dao.UserDao;
 import techit.rest.error.RestException;
-import techit.util.GsonUtil;
 
 @RestController
 public class TicketController {
@@ -42,113 +37,250 @@ public class TicketController {
 	@Autowired
 	private UserDao userDao;
 
-	@RequestMapping(value = "/ticket/{id}", method = RequestMethod.GET)
-	public Ticket getTicket(@PathVariable Long id) {
-		return ticketDao.getTicket(id);
+	@RequestMapping(value = "/ticket/{ticketId}", method = RequestMethod.GET)
+	public Ticket getTicket(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long id) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+
+		Ticket ticket = ticketDao.getTicket(id);
+		if (ticket == null)
+			throw new RestException(404, "Resource Not Found: No such Ticket exists");
+
+		currentUser = userDao.getUser(currentUser.getId());
+		Unit unit = ticket.getUnit();
+		if (currentUser.getType() == Type.ADMIN
+				|| (currentUser.getType() == Type.SUPERVISOR && unit.getSupervisors().contains(currentUser))
+				|| (currentUser.getType() == Type.TECHNICIAN && unit.getTechnicians().contains(currentUser))
+				|| (currentUser.getType() == Type.REGULAR && ticket.getCreatedBy().getId() == currentUser.getId())) {
+			return ticket;
+
+		} else {
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+		}
 	}
 
 	@RequestMapping(value = "/ticket/", method = RequestMethod.GET)
-	public List<Ticket> getTickets() {
-		return ticketDao.getTickets();
+	public List<Ticket> getTickets(@ModelAttribute("currentUser") User currentUser) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+
+		/*
+		 * 1. admin -> all 2. normal -> only tickets created by current user
+		 */
+
+		if (currentUser.getType() == Type.ADMIN) {
+			return ticketDao.getTickets();
+
+		} else if (currentUser.getType() == Type.REGULAR) {
+			return ticketDao.getTicketsCreatedBy(currentUser);
+
+		} else {
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+		}
 	}
 
 	@RequestMapping(value = "/ticket/", method = RequestMethod.POST)
-	public Ticket addTicket(@RequestBody Ticket ticket) {
-		if (StringUtils.isEmpty(ticket.getCreatedBy()) || StringUtils.isEmpty(ticket.getCreatedForEmail())
-				|| StringUtils.isEmpty(ticket.getSubject()) || StringUtils.isEmpty(ticket.getUnit()))
+	public Ticket addTicket(@ModelAttribute("currentUser") User currentUser, @RequestBody Ticket ticket) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+
+		if (StringUtils.isEmpty(ticket.getCreatedForEmail()) || StringUtils.isEmpty(ticket.getSubject())
+				|| StringUtils.isEmpty(ticket.getUnit()))
 			throw new RestException(400, "Missing CreatedBy, CreatedForEmail, Subject or Unit.");
 
+		ticket.setCreatedBy(currentUser);
 		return ticketDao.saveTicket(ticket);
 	}
 
-	@RequestMapping(value = "/ticket/assign", method = RequestMethod.POST)
-	public Object assignTickets(@RequestBody Map<String, Object> request) {
-		if (StringUtils.isEmpty(request.get("ticket")) || StringUtils.isEmpty(request.get("technician")))
-			throw new RestException(404, "Bad Request: Technician or Ticket not found");
+	@RequestMapping(value = "/ticket/{ticketId}", method = RequestMethod.PUT)
+	public Ticket updateTicket(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
+			@RequestBody Ticket ticket) {
 
-		Ticket ticket = ticketDao.getTicket(Long.parseLong(request.get("ticket").toString()));
-		User tech = userDao.getUser(Long.parseLong(request.get("technician").toString()));
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 
-		if (ticket == null || tech == null)
-			throw new RestException(404, "Bad Request: No such Technician or Ticket found");
+		Ticket t = ticketDao.getTicket(ticketId);
 
-		Date date = Calendar.getInstance().getTime();
-		List<User> techs = ticket.getTechnicians();
-		techs.add(tech);
-		ticket.setTechnicians(techs);
-		ticket.setDateAssigned(date);
-		ticket.setDateUpdated(date);
+		if (t == null)
+			throw new RestException(404, "Resource Not Found: No such Ticket exists");
 
-		Update update = new Update();
-		update.setDate(date);
-		update.setDetails("Ticket ID:" + ticket.getId() + " assigned to User:" + tech.getUsername());
-		update.setTechnician(tech);
-		update.setTicket(ticket);
+		if (currentUser.getType() != Type.ADMIN && t.getCreatedBy().getId() != currentUser.getId())
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 
-		ticketDao.saveTicket(ticket);
-		updateDao.saveUpdate(update);
+		if (ticket == null || StringUtils.isEmpty(ticket.getCreatedForEmail())
+				|| StringUtils.isEmpty(ticket.getSubject()))
+			throw new RestException(400, "Bad Request: createdForEmail, subject or Ticket not found");
 
-		return new ResponseEntity<Object>("Operation Successful", HttpStatus.OK);
+		// replace only selected fields into original ticket to prevent user from
+		// changing fields like technicians, updates, priority, status, dates, etc.
+		t.setSubject(ticket.getSubject());
+		t.setDetails(ticket.getDetails());
+		t.setCreatedForDepartment(ticket.getCreatedForDepartment());
+		t.setCreatedForEmail(ticket.getCreatedForEmail());
+		t.setCreatedForName(ticket.getCreatedForName());
+		t.setCreatedForPhone(ticket.getCreatedForPhone());
+		// t.setDateUpdated(Calendar.getInstance().getTime());
+		t.setLocation(ticket.getLocation());
+
+		return ticketDao.saveTicket(t);
 	}
 
-	@RequestMapping(value = "/ticket/", method = RequestMethod.PUT)
-	public Update updateTicket(@RequestBody Map<String, Object> update) {
+	@RequestMapping(value = "/ticket/{ticketId}/technicians", method = RequestMethod.GET)
+	public List<User> getTechnicians(@ModelAttribute("currentUser") User currentUser,
+			@PathVariable("ticketId") Long ticketId) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 
-		if (StringUtils.isEmpty(update.get("details")) || StringUtils.isEmpty(update.get("modifiedBy"))
-				|| StringUtils.isEmpty(update.get("ticket")))
-			throw new RestException(404, "Bad Request: Details, Technician or Ticket not found");
+		Ticket t = ticketDao.getTicket(ticketId);
+		if (t == null)
+			throw new RestException(404, "Resource Not Found: No such Ticket exists");
 
-		User user = userDao.getUser(Long.parseLong(update.get("modifiedBy").toString()));
-		Ticket newTicket = GsonUtil.fromJson(update.get("ticket").toString(), Ticket.class);
+		currentUser = userDao.getUser(currentUser.getId());
 
-		Ticket ticket = ticketDao.getTicket(newTicket.getId());
-		Date date = Calendar.getInstance().getTime();
+		if (currentUser.getType() == Type.ADMIN
+				|| (currentUser.getType() == Type.SUPERVISOR && t.getUnit().getSupervisors().contains(currentUser))
+				|| (currentUser.getType() == Type.TECHNICIAN && t.getUnit().getTechnicians().contains(currentUser))
+				|| (currentUser.getType() == Type.REGULAR && t.getCreatedBy().equals(currentUser))) {
+			return t.getTechnicians();
+		} else
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+	}
 
-		if (user == null || ticket == null)
-			throw new RestException(404, "Bad Request: No such User or Ticket found");
-		if (StringUtils.isEmpty(newTicket.getCreatedForName()) && StringUtils.isEmpty(newTicket.getCreatedForEmail())
-				&& StringUtils.isEmpty(newTicket.getCreatedForPhone())
-				&& StringUtils.isEmpty(newTicket.getCreatedForDepartment())
-				&& StringUtils.isEmpty(newTicket.getSubject()) && StringUtils.isEmpty(newTicket.getDetails())
-				&& StringUtils.isEmpty(newTicket.getLocation()) && StringUtils.isEmpty(newTicket.getUnit())
-				&& StringUtils.isEmpty(newTicket.getStatus()) && StringUtils.isEmpty(newTicket.getPriority())) {
-			throw new RestException(404, "Bad Request: No Modification provided");
-		} else {
-			ticket.setCreatedForName(StringUtils.isEmpty(newTicket.getCreatedForName()) ? ticket.getCreatedForName()
-					: newTicket.getCreatedForName());
-			ticket.setCreatedForEmail(StringUtils.isEmpty(newTicket.getCreatedForEmail()) ? ticket.getCreatedForEmail()
-					: newTicket.getCreatedForEmail());
-			ticket.setCreatedForPhone(StringUtils.isEmpty(newTicket.getCreatedForPhone()) ? ticket.getCreatedForPhone()
-					: newTicket.getCreatedForPhone());
-			ticket.setCreatedForDepartment(
-					StringUtils.isEmpty(newTicket.getCreatedForDepartment()) ? ticket.getCreatedForDepartment()
-							: newTicket.getCreatedForDepartment());
-			ticket.setSubject(
-					StringUtils.isEmpty(newTicket.getSubject()) ? ticket.getSubject() : newTicket.getSubject());
-			ticket.setDetails(
-					StringUtils.isEmpty(newTicket.getDetails()) ? ticket.getDetails() : newTicket.getDetails());
-			ticket.setLocation(
-					StringUtils.isEmpty(newTicket.getLocation()) ? ticket.getLocation() : newTicket.getLocation());
-			ticket.setUnit(StringUtils.isEmpty(newTicket.getUnit()) ? ticket.getUnit() : newTicket.getUnit());
-			ticket.setStatus(StringUtils.isEmpty(newTicket.getStatus()) ? ticket.getStatus() : newTicket.getStatus());
-			if (!StringUtils.isEmpty(newTicket.getStatus())) {
-				ticket.setStatus(newTicket.getStatus());
-				if (newTicket.getStatus().equals(Status.CLOSED))
-					ticket.setDateClosed(date);
+	@RequestMapping(value = "/ticket/{ticketId}/technicians/{userId}", method = RequestMethod.PUT)
+	public Ticket assignTechnicians(@ModelAttribute("currentUser") User currentUser,
+			@PathVariable("ticketId") Long ticketId, @PathVariable("userId") Long userId) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+
+		Ticket t = ticketDao.getTicket(ticketId);
+		if (t == null)
+			throw new RestException(404, "Resource Not Found: No such Ticket exists");
+
+		currentUser = userDao.getUser(currentUser.getId());
+
+		if ((currentUser.getType() == Type.SUPERVISOR && t.getUnit().getSupervisors().contains(currentUser))
+				|| (currentUser.getType() == Type.TECHNICIAN && t.getUnit().getTechnicians().contains(currentUser))) {
+
+			User tech = userDao.getUser(userId);
+			if (tech == null || !t.getUnit().getTechnicians().contains(tech))
+				throw new RestException(404, "Resource Not Found: No such Technician exists within the unit");
+
+			t.getTechnicians().add(tech);
+			return t;
+		} else
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+	}
+
+	@RequestMapping(value = "/ticket/{ticketId}/status/{status}", method = RequestMethod.PUT)
+	public Update setStatus(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
+			@PathVariable("status") String statusVal, @RequestBody Map<String, String> map) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+
+		Ticket t = ticketDao.getTicket(ticketId);
+		if (t == null)
+			throw new RestException(404, "Resource Not Found: No such Ticket exists");
+
+		currentUser = userDao.getUser(currentUser.getId());
+
+		if ((currentUser.getType() == Type.SUPERVISOR && t.getUnit().getSupervisors().contains(currentUser))
+				|| (currentUser.getType() == Type.TECHNICIAN && t.getTechnicians().contains(currentUser))) {
+
+			Update update = new Update();
+			update.setDate(Calendar.getInstance().getTime());
+			update.setTechnician(currentUser);
+			update.setTicket(t);
+
+			Status status;
+			try {
+				status = Status.valueOf(statusVal.toUpperCase());
+			} catch (Exception e) {
+				throw new RestException(400,
+						"Bad Request: Invalid status. Expected COMPLETED, CLOSED, OPEN, ASSIGNED or ONHOLD");
 			}
-			ticket.setPriority(
-					StringUtils.isEmpty(newTicket.getPriority()) ? ticket.getPriority() : newTicket.getPriority());
-		}
 
-		ticket.setDateUpdated(date);
+			switch (status) {
+			case COMPLETED:
+			case CLOSED:
+				// message check
+				if (!map.containsKey("message") || StringUtils.isEmpty(map.get("message")))
+					throw new RestException(400, "Bad Request: Please provide message to change to this status");
 
-		Update newUpdate = new Update();
-		newUpdate.setDate(date);
-		newUpdate.setDetails(update.get("details").toString());
-		newUpdate.setTechnician(user);
-		newUpdate.setTicket(ticket);
+				update.setDetails("Status updated to :" + status + ". Message:" + map.get("message"));
+				break;
 
-		ticketDao.saveTicket(ticket);
-		return updateDao.saveUpdate(newUpdate);
+			case OPEN:
+			case ASSIGNED:
+			case ONHOLD:
+				// no message check, set default message
+				update.setDetails("Status updated to :" + status);
+				break;
+			}
+
+			return updateDao.saveUpdate(update);
+		} else
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 	}
+
+	@RequestMapping(value = "/ticket/{ticketId}/priority/{priority}", method = RequestMethod.PUT)
+	public Ticket setPriority(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
+			@PathVariable("priority") String priorityVal) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+
+		Ticket t = ticketDao.getTicket(ticketId);
+		if (t == null)
+			throw new RestException(404, "Resource Not Found: No such Ticket exists");
+
+		currentUser = userDao.getUser(currentUser.getId());
+
+		if (currentUser.getType() == Type.SUPERVISOR && t.getUnit().getSupervisors().contains(currentUser)) {
+			Priority priority;
+			try {
+				priority = Priority.valueOf(priorityVal.toUpperCase());
+			} catch (Exception e) {
+				throw new RestException(400, "Bad Request: Invalid priority. Expected HIGH, LOW or MEDIUM");
+			}
+
+			switch (priority) {
+			case HIGH:
+			case LOW:
+			case MEDIUM:
+				t.setPriority(priority);
+				break;
+			}
+			return ticketDao.saveTicket(t);
+		} else
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+	}
+
+	@RequestMapping(value = "/ticket/{ticketId}/updates", method = RequestMethod.POST)
+	public Update addUpdate(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
+			@RequestBody Update update) {
+		if (currentUser == null)
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+
+		Ticket t = ticketDao.getTicket(ticketId);
+		if (t == null)
+			throw new RestException(404, "Resource Not Found: No such Ticket exists");
+
+		currentUser = userDao.getUser(currentUser.getId());
+
+		if (currentUser.getType() == Type.ADMIN
+				|| (currentUser.getType() == Type.SUPERVISOR && t.getUnit().getSupervisors().contains(currentUser))
+				|| (currentUser.getType() == Type.TECHNICIAN && t.getTechnicians().contains(currentUser))
+				|| (currentUser.getType() == Type.REGULAR && t.getCreatedBy().equals(currentUser))) {
+
+			if (update == null || StringUtils.isEmpty(update.getDetails()))
+				throw new RestException(400, "Bad Request: Please provide details for the update");
+
+			update.setDate(Calendar.getInstance().getTime());
+			update.setTechnician(currentUser);
+			update.setTicket(t);
+
+			return updateDao.saveUpdate(update);
+		} else
+			throw new RestException(403, "Unauthorized: Insufficient Privilege");
+	}
+
 }
