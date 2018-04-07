@@ -40,6 +40,8 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 	String adminToken; // id=1
 	String regularUserToken; // id=5
 
+	String supervisorToken;
+
 	@BeforeClass
 	void setup() throws UnsupportedEncodingException, Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -60,6 +62,12 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
 				.andReturn().getResponse().getContentAsString();
 		regularUserToken = new ObjectMapper().readTree(res).get("jwt").textValue();
+
+		res = this.mockMvc
+				.perform(post("/login").content("username=jsmith&password=abcd")
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+				.andReturn().getResponse().getContentAsString();
+		supervisorToken = new ObjectMapper().readTree(res).get("jwt").textValue();
 	}
 
 	@Test
@@ -88,20 +96,54 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 
 	@Test
 	void addTicket1() throws Exception {
-		this.mockMvc
-				.perform(post("/tickets").header("Authorization", "Bearer " + regularUserToken).content(
-						"{\"createdForEmail\": \"testemail@email.com\",\"subject\": \"Projector Malfunction\",\"unitId\":1}")
-						.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().isOk()).andExpect(jsonPath("createdForEmail").value("testemail@email.com"));
+		this.mockMvc.perform(post("/tickets").header("Authorization", "Bearer " + regularUserToken).content(
+				"{\"createdForEmail\": \"testemail@email.com\",\"subject\": \"Projector Malfunction\",\"unitId\":1}")
+				.contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(status().isOk())
+				.andExpect(jsonPath("createdForEmail").value("testemail@email.com"));
 	}
 
 	@Test
 	void addTicket2() throws Exception {
 		this.mockMvc
-		.perform(post("/tickets").header("Authorization", "Bearer " + regularUserToken).content(
-				"{\"subject\": \"Projector Malfunction\",\"unitId\":1}")
-				.contentType(MediaType.APPLICATION_JSON_VALUE))
-		.andExpect(status().is(400)).andExpect(jsonPath("createdForEmail").doesNotExist());
+				.perform(post("/tickets").header("Authorization", "Bearer " + regularUserToken)
+						.content("{\"subject\": \"Projector Malfunction\",\"unitId\":1}")
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().is(400)).andExpect(jsonPath("createdForEmail").doesNotExist());
 	}
 
+	@Test
+	void getTechnicians1() throws Exception {
+		this.mockMvc.perform(get("/tickets/1/technicians").header("Authorization", "Bearer " + adminToken))
+				.andExpect(status().isOk()).andExpect(jsonPath("id").value(3));
+	}
+
+	@Test
+	void getTechnicians2() throws Exception {
+		this.mockMvc.perform(get("/tickets/3/technicians").header("Authorization", "Bearer " + adminToken))
+				.andExpect(status().is(404)).andExpect(jsonPath("id").doesNotExist());
+	}
+
+	@Test
+	void getAssignTech1() throws Exception {
+		this.mockMvc.perform(put("/tickets/2/technicians/3").header("Authorization", "Bearer " + regularUserToken))
+				.andExpect(status().is(403)).andExpect(jsonPath("id").doesNotExist());
+	}
+
+	@Test
+	void getAssignTech2() throws Exception {
+		this.mockMvc.perform(put("/tickets/2/technicians/3").header("Authorization", "Bearer " + bleeUserToken))
+				.andExpect(status().isOk()).andExpect(jsonPath("id").value(2));
+	}
+	
+	@Test
+	void setStatus1() throws Exception {
+		this.mockMvc.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + regularUserToken))
+				.andExpect(status().is(403)).andExpect(jsonPath("id").doesNotExist());
+	}
+
+	@Test
+	void setStatus2() throws Exception {
+		this.mockMvc.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + supervisorToken))
+				.andExpect(status().isOk()).andExpect(jsonPath("id").value(2));
+	}
 }
