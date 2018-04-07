@@ -18,8 +18,9 @@ public interface TicketDao {
 
     List<Ticket> getTicketsAssignedTo( Unit unit );
 
-    List<Ticket> getTocketsAssignedTo( User technician );
+	List<Ticket> getTicketsAssignedTo(User technician);
 
     Ticket saveTicket( Ticket ticket );
 
+	List<Ticket> getTicketsCreatedBy(User user, Unit unit);
 }

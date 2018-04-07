@@ -44,6 +44,17 @@ public class TicketDaoImpl implements TicketDao {
     }
 
     @Override
+    public List<Ticket> getTicketsCreatedBy( User user , Unit unit)
+    {
+        String query = "from Ticket where createdBy = :user and unit = :unit";
+
+        return entityManager.createQuery( query, Ticket.class )
+                .setParameter( "user", user )
+                .setParameter( "unit", unit )
+            .getResultList();
+    }
+
+    @Override
     public List<Ticket> getTicketsCreatedFor( String email )
     {
         String query = "from Ticket where createdForEmail = :email";
@@ -64,7 +75,7 @@ public class TicketDaoImpl implements TicketDao {
     }
 
     @Override
-    public List<Ticket> getTocketsAssignedTo( User technician )
+    public List<Ticket> getTicketsAssignedTo( User technician )
     {
         String query = "select t from Ticket t join t.technicians tt "
             + "where tt = :technician";
@@ -74,6 +85,7 @@ public class TicketDaoImpl implements TicketDao {
             .getResultList();
     }
 
+    
     @Override
     @Transactional
     public Ticket saveTicket( Ticket ticket )
