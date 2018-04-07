@@ -77,28 +77,31 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 	@Test
 	void getTicket1() throws Exception {
 		this.mockMvc.perform(get("/tickets/1").header("Authorization", "Bearer " + regularUserToken))
-				.andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1));
+				.andExpect(status().isOk()).andExpect(jsonPath("id").value(1));
 	}
 
 	@Test
 	void getTicket2() throws Exception {
 		this.mockMvc.perform(get("/tickets/5").header("Authorization", "Bearer " + regularUserToken))
-				.andExpect(status().is(404)).andExpect(jsonPath("$[0].id").doesNotExist());
+				.andExpect(status().is(404)).andExpect(jsonPath("id").doesNotExist());
 	}
 
 	@Test
 	void addTicket1() throws Exception {
 		this.mockMvc
 				.perform(post("/tickets").header("Authorization", "Bearer " + regularUserToken).content(
-						"{\"createdForName\": \"Joseph Joestar\",\"subject\": \"Projector Malfunction\",\"unitId\":1}")
+						"{\"createdForEmail\": \"testemail@email.com\",\"subject\": \"Projector Malfunction\",\"unitId\":1}")
 						.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1));
+				.andExpect(status().isOk()).andExpect(jsonPath("createdForEmail").value("testemail@email.com"));
 	}
 
 	@Test
 	void addTicket2() throws Exception {
-		this.mockMvc.perform(post("/tickets").header("Authorization", "Bearer " + regularUserToken))
-				.andExpect(status().is(404)).andExpect(jsonPath("$[0].id").doesNotExist());
+		this.mockMvc
+		.perform(post("/tickets").header("Authorization", "Bearer " + regularUserToken).content(
+				"{\"subject\": \"Projector Malfunction\",\"unitId\":1}")
+				.contentType(MediaType.APPLICATION_JSON_VALUE))
+		.andExpect(status().is(400)).andExpect(jsonPath("createdForEmail").doesNotExist());
 	}
 
 }
