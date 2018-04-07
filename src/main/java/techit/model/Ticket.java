@@ -100,16 +100,19 @@ public class Ticket implements Serializable {
 	}
 
 	@JsonCreator
-	public Ticket(@JsonProperty("createdById") long userId, @JsonProperty("unitId") long unitId,
+	public Ticket(@JsonProperty("unitId") long unitId,
 			@JsonProperty("technicianIds") JsonNode techIds) {
 		priority = Priority.MEDIUM;
 		status = Status.OPEN;
 		technicians = new ArrayList<User>();
 		updates = new ArrayList<Update>();
-		unit = new Unit();
-		unit.setId(unitId);
-		createdBy = new User();
-		createdBy.setId(userId);
+		if(unitId<1)
+			unit=null;
+		else {
+			unit = new Unit();
+			unit.setId(unitId);
+		}
+		if(techIds!=null)
 		for (JsonNode node : techIds) {
 			User u = new User();
 			u.setId(node.asLong());

@@ -53,9 +53,6 @@ class UserControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
 				.andReturn().getResponse().getContentAsString();
 		regularUserToken = new ObjectMapper().readTree(res).get("jwt").textValue();
-
-		System.out.println(adminToken);
-		System.out.println(regularUserToken);
 	}
 
 	@Test
@@ -90,20 +87,54 @@ class UserControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 
 	@Test
 	void addUser1() throws Exception {
+		String username = RandomString.make(10);
 		this.mockMvc
-				.perform(post("/users").header("Authorization", "Bearer " + regularUserToken).content(
-						"{\"username\": \"techit\",\"password\":\"abcd\",\"firstName\": \"FName\",\"lastName\": \"LName\"}")
+				.perform(post("/users").header("Authorization", "Bearer " + regularUserToken)
+						.content("{\"username\": \"" + username
+								+ "\",\"password\":\"abcd\",\"firstName\": \"FName\",\"lastName\": \"LName\"}")
 						.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().is(403)).andExpect(jsonPath("username").doesNotExist());
 	}
 
 	@Test
 	void addUser2() throws Exception {
+		String username = RandomString.make(10);
 		this.mockMvc
-				.perform(post("/users").header("Authorization", "Bearer " + adminToken).content(
-						"{\"username\": \"techit\",\"password\":\"abcd\",\"firstName\": \"FName\",\"lastName\": \"LName\"}")
+				.perform(post("/users").header("Authorization", "Bearer " + adminToken)
+						.content("{\"username\": \"" + username
+								+ "\",\"password\":\"abcd\",\"firstName\": \"FName\",\"lastName\": \"LName\"}")
 						.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().isOk()).andExpect(jsonPath("username").value("user1"));
+				.andExpect(status().isOk()).andExpect(jsonPath("username").value(username));
+	}
+
+	@Test
+	void editUser1() throws Exception {
+		this.mockMvc
+				.perform(post("/users/5").header("Authorization", "Bearer " + regularUserToken)
+						.content("{\"username\": \"jojo\",\"firstName\": \"Joseph\",\"lastName\": \"LName\"}")
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk()).andExpect(jsonPath("lastName").value("LName"));
+	}
+
+	@Test
+	void editUser2() throws Exception {
+		this.mockMvc
+				.perform(post("/users/4").header("Authorization", "Bearer " + regularUserToken)
+						.content("{\"username\": \"jojo\",\"firstName\": \"Joseph\",\"lastName\": \"LName\"}")
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk()).andExpect(jsonPath("lastName").value("LName"));
+	}
+
+	@Test
+	void getTickets1() throws Exception {
+		this.mockMvc.perform(get("/users/5/tickets").header("Authorization", "Bearer " + regularUserToken))
+				.andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1));
+	}
+
+	@Test
+	void getTickets2() throws Exception {
+		this.mockMvc.perform(get("/users/4/tickets").header("Authorization", "Bearer " + regularUserToken))
+				.andExpect(status().is(403)).andExpect(jsonPath("$[0].id").doesNotExist());
 	}
 
 }

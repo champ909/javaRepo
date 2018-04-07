@@ -37,7 +37,7 @@ public class TicketController {
 	@Autowired
 	private UserDao userDao;
 
-	@RequestMapping(value = "/ticket/{ticketId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/tickets/{ticketId}", method = RequestMethod.GET)
 	public Ticket getTicket(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long id) {
 		if (currentUser == null)
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
@@ -59,7 +59,7 @@ public class TicketController {
 		}
 	}
 
-	@RequestMapping(value = "/ticket/", method = RequestMethod.GET)
+	@RequestMapping(value = "/tickets", method = RequestMethod.GET)
 	public List<Ticket> getTickets(@ModelAttribute("currentUser") User currentUser) {
 		if (currentUser == null)
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
@@ -79,20 +79,20 @@ public class TicketController {
 		}
 	}
 
-	@RequestMapping(value = "/ticket/", method = RequestMethod.POST)
+	@RequestMapping(value = "/tickets", method = RequestMethod.POST)
 	public Ticket addTicket(@ModelAttribute("currentUser") User currentUser, @RequestBody Ticket ticket) {
 		if (currentUser == null)
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 
 		if (StringUtils.isEmpty(ticket.getCreatedForEmail()) || StringUtils.isEmpty(ticket.getSubject())
 				|| StringUtils.isEmpty(ticket.getUnit()))
-			throw new RestException(400, "Missing CreatedBy, CreatedForEmail, Subject or Unit.");
+			throw new RestException(400, "Missing CreatedForEmail, Subject or Unit.");
 
 		ticket.setCreatedBy(currentUser);
 		return ticketDao.saveTicket(ticket);
 	}
 
-	@RequestMapping(value = "/ticket/{ticketId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/tickets/{ticketId}", method = RequestMethod.PUT)
 	public Ticket updateTicket(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
 			@RequestBody Ticket ticket) {
 
@@ -125,7 +125,7 @@ public class TicketController {
 		return ticketDao.saveTicket(t);
 	}
 
-	@RequestMapping(value = "/ticket/{ticketId}/technicians", method = RequestMethod.GET)
+	@RequestMapping(value = "/tickets/{ticketId}/technicians", method = RequestMethod.GET)
 	public List<User> getTechnicians(@ModelAttribute("currentUser") User currentUser,
 			@PathVariable("ticketId") Long ticketId) {
 		if (currentUser == null)
@@ -146,7 +146,7 @@ public class TicketController {
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 	}
 
-	@RequestMapping(value = "/ticket/{ticketId}/technicians/{userId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/tickets/{ticketId}/technicians/{userId}", method = RequestMethod.PUT)
 	public Ticket assignTechnicians(@ModelAttribute("currentUser") User currentUser,
 			@PathVariable("ticketId") Long ticketId, @PathVariable("userId") Long userId) {
 		if (currentUser == null)
@@ -171,7 +171,7 @@ public class TicketController {
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 	}
 
-	@RequestMapping(value = "/ticket/{ticketId}/status/{status}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/tickets/{ticketId}/status/{status}", method = RequestMethod.PUT)
 	public Update setStatus(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
 			@PathVariable("status") String statusVal, @RequestBody Map<String, String> map) {
 		if (currentUser == null)
@@ -222,7 +222,7 @@ public class TicketController {
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 	}
 
-	@RequestMapping(value = "/ticket/{ticketId}/priority/{priority}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/tickets/{ticketId}/priority/{priority}", method = RequestMethod.PUT)
 	public Ticket setPriority(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
 			@PathVariable("priority") String priorityVal) {
 		if (currentUser == null)
@@ -254,7 +254,7 @@ public class TicketController {
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 	}
 
-	@RequestMapping(value = "/ticket/{ticketId}/updates", method = RequestMethod.POST)
+	@RequestMapping(value = "/tickets/{ticketId}/updates", method = RequestMethod.POST)
 	public Update addUpdate(@ModelAttribute("currentUser") User currentUser, @PathVariable("ticketId") Long ticketId,
 			@RequestBody Update update) {
 		if (currentUser == null)

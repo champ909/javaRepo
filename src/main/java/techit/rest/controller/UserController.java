@@ -42,15 +42,15 @@ public class UserController {
 		return userDao.getUsers();
 	}
 
-	@RequestMapping(value = "/users", method = RequestMethod.PUT)
-	public User updateUser(@ModelAttribute("currentUser") User currentUser, @RequestBody User user) {
-		if (user == null || user.getId() == null || StringUtils.isEmpty(user.getUsername()))
+	@RequestMapping(value = "/users/{userId}", method = RequestMethod.PUT)
+	public User updateUser(@ModelAttribute("currentUser") User currentUser, @RequestBody User user, @PathVariable("userId") Long userId) {
+		if (user == null || userId == null || StringUtils.isEmpty(user.getUsername()))
 			throw new RestException(400, "Bad Request: Missing id or username");
 
-		if (currentUser == null || (currentUser.getType() != Type.ADMIN && currentUser.getId() != user.getId()))
+		if (currentUser == null || (currentUser.getType() != Type.ADMIN && currentUser.getId() != userId))
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");
 
-		User userObj = userDao.getUser(user.getId());
+		User userObj = userDao.getUser(userId);
 		if (userObj == null)
 			throw new RestException(404, "Resource Not Found");
 

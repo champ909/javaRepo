@@ -81,6 +81,9 @@ public class UnitController {
 		currentUser = userDao.getUser(currentUser.getId());
 
 		Unit unit = unitDao.getUnit(unitId);
+		if (unit == null)
+			throw new RestException(404, "Resource Not Found: No such Unit exists");
+
 		if (currentUser.getType() == Type.ADMIN
 				|| (currentUser.getType() == Type.SUPERVISOR && unit.getSupervisors().contains(currentUser))
 				|| (currentUser.getType() == Type.TECHNICIAN && unit.getTechnicians().contains(currentUser))) {
