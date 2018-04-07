@@ -36,36 +36,74 @@ class UserControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 	private WebApplicationContext wac;
 
 	private MockMvc mockMvc;
-	String adminToken;				// id=1
-	String regularUserToken;			// id=5
+	String adminToken; // id=1
+	String regularUserToken; // id=5
 
 	@BeforeClass
 	void setup() throws UnsupportedEncodingException, Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-		String res = this.mockMvc.perform(post("/login").content("username=techit&password=abcd")
-				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)).andReturn().getResponse().getContentAsString();
+		String res = this.mockMvc
+				.perform(post("/login").content("username=techit&password=abcd")
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+				.andReturn().getResponse().getContentAsString();
 		adminToken = new ObjectMapper().readTree(res).get("jwt").textValue();
 
-		res = this.mockMvc.perform(post("/login").content("username=jojo&password=abcd")
-				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)).andReturn().getResponse().getContentAsString();
+		res = this.mockMvc
+				.perform(post("/login").content("username=jojo&password=abcd")
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+				.andReturn().getResponse().getContentAsString();
 		regularUserToken = new ObjectMapper().readTree(res).get("jwt").textValue();
+
+		System.out.println(adminToken);
+		System.out.println(regularUserToken);
 	}
 
 	@Test
 	void getUser() throws Exception {
-		this.mockMvc.perform(get("/users/5").header("Authorization", "Bearer "+regularUserToken)).andExpect(status().isOk())
-				.andExpect(jsonPath("username").value("jojo"));
+		this.mockMvc.perform(get("/users/5").header("Authorization", "Bearer " + regularUserToken))
+				.andExpect(status().isOk()).andExpect(jsonPath("username").value("jojo"));
 	}
 
 	@Test
 	void getUser2() throws Exception {
-		this.mockMvc.perform(get("/users/4").header("Authorization", "Bearer "+regularUserToken)).andExpect(status().is(403))
-				.andExpect(jsonPath("username").doesNotExist());
+		this.mockMvc.perform(get("/users/4").header("Authorization", "Bearer " + regularUserToken))
+				.andExpect(status().is(403)).andExpect(jsonPath("username").doesNotExist());
 	}
 
 	@Test
 	void getUser3() throws Exception {
-		this.mockMvc.perform(get("/users/100").header("Authorization", "Bearer "+adminToken)).andExpect(status().is(404))
-				.andExpect(jsonPath("username").doesNotExist());
+		this.mockMvc.perform(get("/users/4").header("Authorization", "Bearer " + adminToken)).andExpect(status().isOk())
+				.andExpect(jsonPath("username").value("blee"));
 	}
+
+	@Test
+	void getUsers1() throws Exception {
+		this.mockMvc.perform(get("/users").header("Authorization", "Bearer " + adminToken)).andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].username").value("techit"));
+	}
+
+	@Test
+	void getUsers2() throws Exception {
+		this.mockMvc.perform(get("/users").header("Authorization", "Bearer " + regularUserToken))
+				.andExpect(status().is(403)).andExpect(jsonPath("$[0].username").doesNotExist());
+	}
+
+	@Test
+	void addUser1() throws Exception {
+		this.mockMvc
+				.perform(post("/users").header("Authorization", "Bearer " + regularUserToken).content(
+						"{\"username\": \"techit\",\"password\":\"abcd\",\"firstName\": \"FName\",\"lastName\": \"LName\"}")
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().is(403)).andExpect(jsonPath("username").doesNotExist());
+	}
+
+	@Test
+	void addUser2() throws Exception {
+		this.mockMvc
+				.perform(post("/users").header("Authorization", "Bearer " + adminToken).content(
+						"{\"username\": \"techit\",\"password\":\"abcd\",\"firstName\": \"FName\",\"lastName\": \"LName\"}")
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk()).andExpect(jsonPath("username").value("user1"));
+	}
+
 }
