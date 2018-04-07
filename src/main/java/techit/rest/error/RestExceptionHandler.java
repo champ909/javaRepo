@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import io.jsonwebtoken.Claims;
 import techit.model.User;
+import techit.model.User.Type;
 import techit.model.dao.UserDao;
 import techit.util.JwtSignatureUtil;
 
@@ -48,6 +49,7 @@ public class RestExceptionHandler {
 		User u = new User();
 		u.setId(claims.get("id", Long.class));
 		u.setUsername(claims.get("username", String.class));
+		u.setType(Type.valueOf(claims.get("role", String.class).toUpperCase()));
 		return u;
 	}
 }

@@ -45,6 +45,7 @@ public class JwtSignatureUtil {
 		Map<String, Object> claims = new PropMap<String, Object>()
 				.put("id", user.getId())
 				.put("username", user.getUsername())
+				.put("role", user.getType())
 				.getMap();
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, expirationTime);
