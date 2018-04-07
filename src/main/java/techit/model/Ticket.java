@@ -20,6 +20,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
@@ -71,6 +72,7 @@ public class Ticket implements Serializable {
 	@JoinTable(name = "ticket_technicians", joinColumns = @JoinColumn(name = "ticket_id"), inverseJoinColumns = @JoinColumn(name = "technician_id"))
 	private List<User> technicians;
 
+    @JsonProperty(access = Access.WRITE_ONLY)
 	@OneToMany(mappedBy = "ticket")
 	private List<Update> updates;
 

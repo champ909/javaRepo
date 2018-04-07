@@ -44,7 +44,7 @@ public class UserController {
 
 	@RequestMapping(value = "/users/{userId}", method = RequestMethod.PUT)
 	public User updateUser(@ModelAttribute("currentUser") User currentUser, @RequestBody User user, @PathVariable("userId") Long userId) {
-		if (user == null || userId == null || StringUtils.isEmpty(user.getUsername()))
+		if (user == null || userId == null)
 			throw new RestException(400, "Bad Request: Missing id or username");
 
 		if (currentUser == null || (currentUser.getType() != Type.ADMIN && currentUser.getId() != userId))
@@ -54,11 +54,10 @@ public class UserController {
 		if (userObj == null)
 			throw new RestException(404, "Resource Not Found");
 
-		if (StringUtils.isEmpty(user.getEmail())) {
-			user.setEmail(user.getUsername() + "@calstatela.edu");
-		}
-
 		user.setHash(userObj.getHash());
+		user.setId(userObj.getId());
+		user.setUsername(userObj.getUsername());
+		user.setEmail(userObj.getEmail());
 		return userDao.saveUser(user);
 	}
 

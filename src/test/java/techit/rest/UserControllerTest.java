@@ -110,8 +110,8 @@ class UserControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 	@Test
 	void editUser1() throws Exception {
 		this.mockMvc
-				.perform(post("/users/5").header("Authorization", "Bearer " + regularUserToken)
-						.content("{\"username\": \"jojo\",\"firstName\": \"Joseph\",\"lastName\": \"LName\"}")
+				.perform(put("/users/5").header("Authorization", "Bearer " + regularUserToken)
+						.content("{\"firstName\": \"Joseph\",\"lastName\": \"LName\"}")
 						.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isOk()).andExpect(jsonPath("lastName").value("LName"));
 	}
@@ -119,10 +119,10 @@ class UserControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 	@Test
 	void editUser2() throws Exception {
 		this.mockMvc
-				.perform(post("/users/4").header("Authorization", "Bearer " + regularUserToken)
-						.content("{\"username\": \"jojo\",\"firstName\": \"Joseph\",\"lastName\": \"LName\"}")
+				.perform(put("/users/4").header("Authorization", "Bearer " + regularUserToken)
+						.content("{\"firstName\": \"Joseph\",\"lastName\": \"LName\"}")
 						.contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().isOk()).andExpect(jsonPath("lastName").value("LName"));
+				.andExpect(status().is(403)).andExpect(jsonPath("lastName").doesNotExist());
 	}
 
 	@Test

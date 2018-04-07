@@ -68,6 +68,11 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
 				.andReturn().getResponse().getContentAsString();
 		supervisorToken = new ObjectMapper().readTree(res).get("jwt").textValue();
+		
+//		System.out.println(bleeUserToken);
+//		System.out.println(adminToken);
+//		System.out.println(regularUserToken);
+//		System.out.println(supervisorToken);
 	}
 
 	@Test
@@ -114,13 +119,13 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 	@Test
 	void getTechnicians1() throws Exception {
 		this.mockMvc.perform(get("/tickets/1/technicians").header("Authorization", "Bearer " + adminToken))
-				.andExpect(status().isOk()).andExpect(jsonPath("id").value(3));
+				.andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(3));
 	}
 
 	@Test
 	void getTechnicians2() throws Exception {
 		this.mockMvc.perform(get("/tickets/3/technicians").header("Authorization", "Bearer " + adminToken))
-				.andExpect(status().is(404)).andExpect(jsonPath("id").doesNotExist());
+				.andExpect(status().is(404)).andExpect(jsonPath("$[0].id").doesNotExist());
 	}
 
 	@Test
@@ -134,16 +139,52 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 		this.mockMvc.perform(put("/tickets/2/technicians/3").header("Authorization", "Bearer " + bleeUserToken))
 				.andExpect(status().isOk()).andExpect(jsonPath("id").value(2));
 	}
-	
+
 	@Test
 	void setStatus1() throws Exception {
-		this.mockMvc.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + regularUserToken))
+		this.mockMvc
+				.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + regularUserToken)
+						.content("{}").contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().is(403)).andExpect(jsonPath("id").doesNotExist());
 	}
 
 	@Test
 	void setStatus2() throws Exception {
-		this.mockMvc.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + supervisorToken))
-				.andExpect(status().isOk()).andExpect(jsonPath("id").value(2));
+		this.mockMvc
+				.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + supervisorToken)
+						.content("{}").contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk()).andExpect(jsonPath("id").value(is(Matchers.greaterThan(0))));
+	}
+	
+	@Test
+	void setPriority1() throws Exception {
+		this.mockMvc
+				.perform(put("/tickets/2/priority/HIGH").header("Authorization", "Bearer " + regularUserToken)
+						.content("{}").contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().is(403)).andExpect(jsonPath("priority").doesNotExist());
+	}
+
+	@Test
+	void setPriority2() throws Exception {
+		this.mockMvc
+				.perform(put("/tickets/2/priority/HIGH").header("Authorization", "Bearer " + supervisorToken)
+						.content("{}").contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk()).andExpect(jsonPath("priority").value("HIGH"));
+	}
+	
+	@Test
+	void addUpdate1() throws Exception {
+		this.mockMvc
+				.perform(post("/tickets/2/updates").header("Authorization", "Bearer " + adminToken)
+						.content("{}").contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().is(400)).andExpect(jsonPath("id").doesNotExist());
+	}
+
+	@Test
+	void addUpdate2() throws Exception {
+		this.mockMvc
+				.perform(post("/tickets/2/updates").header("Authorization", "Bearer " + supervisorToken)
+						.content("{\"details\":\"Test Details\"}").contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isOk()).andExpect(jsonPath("id").value(is(Matchers.greaterThan(0))));
 	}
 }

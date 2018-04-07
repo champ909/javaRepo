@@ -3,6 +3,7 @@ package techit.model.dao;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.Test;
@@ -33,9 +34,10 @@ public class UserDaoTest extends AbstractTransactionalTestNGSpringContextTests {
 
 	@Test
 	public void saveUser() {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 		User user = new User();
 		user.setUsername("Tom" + new Date().toString());
-		user.setPassword("abcd");
+		user.setHash(encoder.encode("abcd"));
 		user.setEmail("googl@csajsj.com");
 		user.setDepartment("Cs departmetnasda");
 		user.setEnabled(true);
