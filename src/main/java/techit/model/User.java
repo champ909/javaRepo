@@ -72,8 +72,12 @@ public class User implements Serializable {
 
     @JsonCreator
     public User(@JsonProperty("unitId") long unitId) {
-        this.unit = new Unit();
-        this.unit.setId(unitId);
+    	if(unitId<1)
+    		this.unit=null;
+    	else {
+            this.unit = new Unit();
+            this.unit.setId(unitId);
+    	}
     }
     
     // Use unitId instead of unit in serialization
