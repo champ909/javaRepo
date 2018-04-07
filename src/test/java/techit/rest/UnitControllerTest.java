@@ -63,7 +63,7 @@ class UnitControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 
 	@Test
 	void getUnits2() throws Exception {
-		this.mockMvc.perform(get("/units").header("Authorization", "Bearer " + regularUserToken)).andExpect(status().isOk())
+		this.mockMvc.perform(get("/units").header("Authorization", "Bearer ")).andExpect(status().is(403))
 		.andExpect(jsonPath("$[0].id").doesNotExist());
 	}
 
@@ -97,7 +97,7 @@ class UnitControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 	@Test
 	void getTechnicians2() throws Exception {
 		this.mockMvc
-				.perform(get("/units/2/technicians").header("Authorization", "Bearer " + regularUserToken))
+				.perform(get("/units/4/technicians").header("Authorization", "Bearer " + regularUserToken))
 				.andExpect(status().is(404)).andExpect(jsonPath("$[0].id").doesNotExist());
 	}
 
@@ -110,7 +110,7 @@ class UnitControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 	@Test
 	void getTickets2() throws Exception {
 		this.mockMvc.perform(get("/units/3/tickets").header("Authorization", "Bearer " + regularUserToken))
-				.andExpect(status().is(403)).andExpect(jsonPath("$[0].id").doesNotExist());
+				.andExpect(status().is(404)).andExpect(jsonPath("$[0].id").doesNotExist());
 	}
 
 }
