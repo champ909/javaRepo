@@ -217,6 +217,8 @@ public class TicketController {
 				break;
 			}
 
+			t.setStatus(status);
+			ticketDao.saveTicket(t);
 			return updateDao.saveUpdate(update);
 		} else
 			throw new RestException(403, "Unauthorized: Insufficient Privilege");

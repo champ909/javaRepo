@@ -145,7 +145,7 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 		this.mockMvc
 				.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + regularUserToken)
 						.content("{}").contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().is(403)).andExpect(jsonPath("id").doesNotExist());
+				.andExpect(status().is(403)).andExpect(jsonPath("ticket.status").doesNotExist());
 	}
 
 	@Test
@@ -153,7 +153,7 @@ class TicketControllerTest extends AbstractTransactionalTestNGSpringContextTests
 		this.mockMvc
 				.perform(put("/tickets/2/status/ONHOLD").header("Authorization", "Bearer " + supervisorToken)
 						.content("{}").contentType(MediaType.APPLICATION_JSON_VALUE))
-				.andExpect(status().isOk()).andExpect(jsonPath("id").value(is(Matchers.greaterThan(0))));
+				.andExpect(status().isOk()).andExpect(jsonPath("ticket.status").value("ONHOLD"));
 	}
 	
 	@Test
